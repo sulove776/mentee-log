@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>멘티 일일 업무 일지</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1a2744;
+  --blue: #2563eb;
+  --blue-soft: #dbeafe;
+  --blue-mid: #93c5fd;
+  --accent: #0ea5e9;
+  --bg: #f0f4fa;
+  --white: #ffffff;
+  --gray-1: #f8fafc;
+  --gray-2: #e2e8f0;
+  --gray-3: #94a3b8;
+  --gray-4: #475569;
+  --text: #1e293b;
+  --radius: 12px;
+  --shadow: 0 2px 16px rgba(37,99,235,0.08);
+  --shadow-card: 0 4px 32px rgba(37,99,235,0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0 0 60px;
+}
+
+/* ── Header ── */
+.site-header {
+  background: var(--navy);
+  padding: 28px 0 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.site-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 20px,
+    rgba(255,255,255,0.03) 20px,
+    rgba(255,255,255,0.03) 40px
+  );
+}
+.site-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.7rem;
+  color: #fff;
+  letter-spacing: -.5px;
+  position: relative;
+}
+.site-header p {
+  color: var(--blue-mid);
+  font-size: .82rem;
+  margin-top: 4px;
+  font-weight: 300;
+  letter-spacing: .5px;
+  position: relative;
+}
+
+/* ── Layout ── */
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 28px 28px 24px;
+  margin-top: 20px;
+  border: 1px solid rgba(37,99,235,0.07);
+  animation: fadeUp .35s ease both;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.card:nth-child(2) { animation-delay: .05s; }
+.card:nth-child(3) { animation-delay: .10s; }
+.card:nth-child(4) { animation-delay: .15s; }
+.card:nth-child(5) { animation-delay: .20s; }
+.card:nth-child(6) { animation-delay: .25s; }
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--blue-soft);
+}
+.card-title .icon {
+  width: 28px; height: 28px;
+  background: var(--blue-soft);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+/* ── Form Elements ── */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--gray-4);
+  margin-bottom: 6px;
+  letter-spacing: .3px;
+}
+
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: .9rem;
+  color: var(--text);
+  background: var(--gray-1);
+  border: 1.5px solid var(--gray-2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+input[type="date"] { cursor: pointer; }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+textarea { resize: vertical; line-height: 1.65; min-height: 90px; }
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--blue);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
+}
+
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+/* ── AM/PM tabs ── */
+.ampm-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.ampm-tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .82rem;
+  font-weight: 500;
+  border: 1.5px solid var(--gray-2);
+  background: var(--gray-1);
+  color: var(--gray-4);
+  transition: all .2s;
+}
+.ampm-tab.active {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.ampm-panel { display: none; }
+.ampm-panel.active { display: block; }
+
+/* ── Stars ── */
+.star-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.star-item { }
+.star-label { font-size: .75rem; font-weight: 500; color: var(--gray-4); margin-bottom: 6px; }
+.stars {
+  display: flex; gap: 5px;
+}
+.star {
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--gray-2);
+  transition: color .12s, transform .1s;
+  user-select: none;
+  line-height: 1;
+}
+.star:hover, .star.on { color: #f59e0b; }
+.star:active { transform: scale(1.3); }
+
+/* ── Tags ── */
+.tag-section { margin-top: 16px; }
+.tag-section-label {
+  font-size: .73rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: var(--gray-3);
+}
+.tag-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.tag {
+  padding: 5px 13px;
+  border-radius: 99px;
+  font-size: .8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid var(--gray-2);
+  background: var(--gray-1);
+  color: var(--gray-4);
+  transition: all .18s;
+  user-select: none;
+}
+.tag:hover { border-color: var(--blue-mid); color: var(--blue); }
+.tag.sel-pos {
+  background: #dcfce7; border-color: #86efac; color: #16a34a;
+}
+.tag.sel-neg {
+  background: #fee2e2; border-color: #fca5a5; color: #dc2626;
+}
+
+/* ── Buttons ── */
+.btn-row {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 24px;
+}
+.btn {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: .88rem;
+  font-weight: 500;
+  padding: 11px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all .18s;
+}
+.btn-ghost {
+  background: transparent;
+  border: 1.5px solid var(--gray-2);
+  color: var(--gray-4);
+}
+.btn-ghost:hover { border-color: var(--blue-mid); color: var(--blue); }
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.25);
+}
+.btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(37,99,235,0.30); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ── Preview ── */
+.preview-box {
+  display: none;
+  background: var(--navy);
+  color: #e2e8f0;
+  font-family: 'Noto Sans KR', monospace;
+  font-size: .83rem;
+  line-height: 1.9;
+  border-radius: 10px;
+  padding: 22px 24px;
+  margin-top: 20px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.preview-box.show { display: block; }
+
+.action-row {
+  display: none;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+.action-row.show { display: flex; }
+
+/* ── History ── */
+.history-section { display: none; }
+.history-section.show { display: block; }
+.hist-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.hist-title { font-size: .78rem; font-weight: 700; color: var(--gray-4); letter-spacing: .5px; text-transform: uppercase; }
+.hist-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-2);
+  background: var(--gray-1);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.hist-item:hover { border-color: var(--blue-mid); background: var(--blue-soft); }
+.hist-item-main { font-size: .87rem; font-weight: 500; }
+.hist-item-sub { font-size: .73rem; color: var(--gray-3); margin-top: 2px; }
+.hist-del {
+  font-size: .73rem;
+  color: #dc2626;
+  padding: 3px 10px;
+  border-radius: 5px;
+  border: 1px solid #fca5a5;
+  background: #fee2e2;
+  cursor: pointer;
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+.hist-del:hover { opacity: .7; }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--navy);
+  color: #fff;
+  padding: 11px 24px;
+  border-radius: 99px;
+  font-size: .85rem;
+  font-weight: 500;
+  opacity: 0;
+  transition: all .25s;
+  pointer-events: none;
+  z-index: 999;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── Section divider ── */
+.sub-divider {
+  height: 1px;
+  background: var(--blue-soft);
+  margin: 18px 0;
+}
+
+@media (max-width: 600px) {
+  .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .star-grid { grid-template-columns: 1fr; }
+  .card { padding: 20px 16px; }
+  .site-header h1 { font-size: 1.35rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <h1>멘티 일일 업무 일지</h1>
+  <p>스마트기술팀 · 멘토 기록용</p>
+</div>
+
+<div class="container">
+
+  <!-- 기본 정보 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="icon">📋</span> 기본 정보
+    </div>
+    <div class="grid-3">
+      <div class="field">
+        <label>날짜</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="field">
+        <label>멘티 이름</label>
+        <input type="text" id="f-name" placeholder="예) 홍동건">
+      </div>
+      <div class="field">
+        <label>근무일수</label>
+        <select id="f-day">
+          <option value="">선택</option>
+          <option>1일차</option><option>2일차</option><option>3일차</option>
+          <option>4일차</option><option>5일차</option>
+          <option>2주차</option><option>3주차</option><option>4주차</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:14px">
+      <div class="field">
+        <label>멘토 이름</label>
+        <input type="text" id="f-mentor" placeholder="예) 김수현">
+      </div>
+      <div class="field">
+        <label>부서</label>
+        <input type="text" id="f-dept" value="스마트기술팀">
+      </div>
+    </div>
+  </div>
+
+  <!-- 업무 내용 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="icon">📝</span> 업무 내용
+    </div>
+    <div class="ampm-tabs">
+      <div class="ampm-tab active" onclick="switchTab('am', this)">🌤 오전</div>
+      <div class="ampm-tab" onclick="switchTab('pm', this)">🌆 오후</div>
+    </div>
+
+    <div class="ampm-panel active" id="panel-am">
+      <div class="field">
+        <label>진행 업무 / 안내사항</label>
+        <textarea id="f-am-work" rows="4" placeholder="오전에 진행하거나 안내한 업무를 기록해주세요"></textarea>
+      </div>
+      <div class="sub-divider"></div>
+      <div class="field">
+        <label>특이사항 (태도 · 반응 · 이슈)</label>
+        <textarea id="f-am-note" rows="3" placeholder="예) 메모를 안 함 → 메모 필수라고 안내"></textarea>
+      </div>
+    </div>
+
+    <div class="ampm-panel" id="panel-pm">
+      <div class="field">
+        <label>진행 업무 / 안내사항</label>
+        <textarea id="f-pm-work" rows="4" placeholder="오후에 진행하거나 안내한 업무를 기록해주세요"></textarea>
+      </div>
+      <div class="sub-divider"></div>
+      <div class="field">
+        <label>특이사항 (태도 · 반응 · 이슈)</label>
+        <textarea id="f-pm-note" rows="3" placeholder="예) 택배 발송 교육 진행, 이때도 메모 안함"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 평가 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="icon">⭐</span> 오늘의 평가
+    </div>
+    <div class="star-grid">
+      <div class="star-item">
+        <div class="star-label">업무 이해도</div>
+        <div class="stars" data-key="comprehension">
+          <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+          <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+        </div>
+      </div>
+      <div class="star-item">
+        <div class="star-label">업무 적극성</div>
+        <div class="stars" data-key="proactivity">
+          <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+          <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+        </div>
+      </div>
+      <div class="star-item">
+        <div class="star-label">커뮤니케이션</div>
+        <div class="stars" data-key="communication">
+          <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+          <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+        </div>
+      </div>
+      <div class="star-item">
+        <div class="star-label">업무 마무리</div>
+        <div class="stars" data-key="followthrough">
+          <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+          <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tag-section">
+      <div class="tag-section-label">✅ 긍정 태도</div>
+      <div class="tag-row" id="tags-pos">
+        <span class="tag" data-type="pos">경청 잘함</span>
+        <span class="tag" data-type="pos">질문 적극적</span>
+        <span class="tag" data-type="pos">빠른 습득</span>
+        <span class="tag" data-type="pos">자기주도적</span>
+        <span class="tag" data-type="pos">꼼꼼함</span>
+        <span class="tag" data-type="pos">밝은 태도</span>
+        <span class="tag" data-type="pos">보고 잘함</span>
+      </div>
+    </div>
+
+    <div class="tag-section" style="margin-top:12px">
+      <div class="tag-section-label">⚠️ 개선 필요</div>
+      <div class="tag-row" id="tags-neg">
+        <span class="tag" data-type="neg">메모 안함</span>
+        <span class="tag" data-type="neg">수동적 태도</span>
+        <span class="tag" data-type="neg">확인 부족</span>
+        <span class="tag" data-type="neg">소통 부재</span>
+        <span class="tag" data-type="neg">집중력 저하</span>
+        <span class="tag" data-type="neg">보고 누락</span>
+        <span class="tag" data-type="neg">마무리 부족</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 내일 예정 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="icon">📌</span> 내일 예정 / 인수인계
+    </div>
+    <div class="field">
+      <textarea id="f-next" rows="3" placeholder="내일 진행할 업무 또는 이어서 안내할 내용을 기록해주세요"></textarea>
+    </div>
+  </div>
+
+  <!-- 멘토 코멘트 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="icon">💬</span> 멘토 종합 코멘트 <span style="font-size:.7rem;color:var(--gray-3);font-weight:400;margin-left:4px">상무님 보고용</span>
+    </div>
+    <div class="field">
+      <textarea id="f-comment" rows="4" placeholder="전반적인 하루 평가 및 상무님께 보고할 내용을 기록해주세요"></textarea>
+    </div>
+  </div>
+
+  <!-- 버튼 -->
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="resetForm()">초기화</button>
+    <button class="btn btn-primary" onclick="generateLog()">📄 일지 생성</button>
+  </div>
+
+  <!-- 미리보기 -->
+  <div class="preview-box" id="preview"></div>
+  <div class="action-row" id="action-row">
+    <button class="btn btn-ghost" onclick="copyLog()">📋 복사</button>
+    <button class="btn btn-ghost" onclick="saveLog()">💾 저장</button>
+    <button class="btn btn-primary" onclick="downloadTxt()">⬇ 다운로드</button>
+  </div>
+
+  <!-- 저장 기록 -->
+  <div class="card history-section" id="hist-section">
+    <div class="hist-header">
+      <div class="card-title" style="margin-bottom:0;border:none;padding:0">
+        <span class="icon">🗂</span> 저장된 일지
+      </div>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const starVals = {comprehension:0, proactivity:0, communication:0, followthrough:0};
+const starLabels = {comprehension:'업무 이해도', proactivity:'업무 적극성', communication:'커뮤니케이션', followthrough:'업무 마무리'};
+
+// Init date
+document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+
+// Star logic
+document.querySelectorAll('.stars').forEach(group => {
+  const key = group.dataset.key;
+  group.querySelectorAll('.star').forEach(s => {
+    s.onclick = () => {
+      starVals[key] = +s.dataset.v;
+      group.querySelectorAll('.star').forEach(ss => ss.classList.toggle('on', +ss.dataset.v <= starVals[key]));
+    };
+  });
+});
+
+// Tag logic
+document.querySelectorAll('.tag').forEach(t => {
+  t.onclick = () => {
+    const type = t.dataset.type;
+    const cls = type === 'pos' ? 'sel-pos' : 'sel-neg';
+    t.classList.toggle(cls);
+  };
+});
+
+// Tab switch
+function switchTab(tab, el) {
+  document.querySelectorAll('.ampm-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ampm-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function starStr(v) { return '★'.repeat(v) + '☆'.repeat(5-v); }
+
+function getTags(id, cls) {
+  return [...document.querySelectorAll(`#${id} .tag.${cls}`)].map(t => t.textContent);
+}
+
+function generateLog() {
+  const date = document.getElementById('f-date').value;
+  const name = document.getElementById('f-name').value || '(미입력)';
+  const mentor = document.getElementById('f-mentor').value || '(미입력)';
+  const dept = document.getElementById('f-dept').value;
+  const dayN = document.getElementById('f-day').value;
+  const amWork = document.getElementById('f-am-work').value;
+  const amNote = document.getElementById('f-am-note').value;
+  const pmWork = document.getElementById('f-pm-work').value;
+  const pmNote = document.getElementById('f-pm-note').value;
+  const next = document.getElementById('f-next').value;
+  const comment = document.getElementById('f-comment').value;
+  const pos = getTags('tags-pos', 'sel-pos');
+  const neg = getTags('tags-neg', 'sel-neg');
+
+  const d = new Date(date);
+  const days = ['일','월','화','수','목','금','토'];
+  const dateStr = date ? `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})` : '날짜 미입력';
+
+  let t = '';
+  t += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  t += `  📋 멘티 일일 업무 일지\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  t += `▸ 날짜    : ${dateStr}${dayN ? ' / ' + dayN : ''}\n`;
+  t += `▸ 멘티    : ${name}\n`;
+  t += `▸ 멘토    : ${mentor}\n`;
+  t += `▸ 부서    : ${dept}\n\n`;
+
+  t += `[ 오전 업무 ]\n`;
+  t += amWork ? `• 업무 내용\n${amWork}\n\n` : '';
+  t += amNote ? `• 특이사항\n${amNote}\n\n` : (!amWork ? '(기록 없음)\n\n' : '');
+
+  t += `[ 오후 업무 ]\n`;
+  t += pmWork ? `• 업무 내용\n${pmWork}\n\n` : '';
+  t += pmNote ? `• 특이사항\n${pmNote}\n\n` : (!pmWork ? '(기록 없음)\n\n' : '');
+
+  t += `[ 오늘의 평가 ]\n`;
+  Object.keys(starVals).forEach(k => {
+    t += `• ${starLabels[k]} : ${starStr(starVals[k])} (${starVals[k]}/5)\n`;
+  });
+  if (pos.length) t += `• 긍정 태도 : ${pos.join(', ')}\n`;
+  if (neg.length) t += `• 개선 필요 : ${neg.join(', ')}\n`;
+  t += '\n';
+
+  if (next) t += `[ 내일 예정 / 인수인계 ]\n${next}\n\n`;
+  if (comment) t += `[ 멘토 종합 코멘트 ]\n${comment}\n`;
+  t += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+  document.getElementById('preview').textContent = t;
+  document.getElementById('preview').classList.add('show');
+  document.getElementById('action-row').classList.add('show');
+  document.getElementById('preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyLog() {
+  navigator.clipboard.writeText(document.getElementById('preview').textContent)
+    .then(() => toast('클립보드에 복사됐어요!'));
+}
+
+function downloadTxt() {
+  const txt = document.getElementById('preview').textContent;
+  const name = document.getElementById('f-name').value || '멘티';
+  const date = document.getElementById('f-date').value || '날짜';
+  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `멘티일지_${name}_${date}.txt`;
+  a.click();
+}
+
+function saveLog() {
+  const key = 'mentee_logs_v2';
+  const logs = JSON.parse(localStorage.getItem(key) || '[]');
+  logs.unshift({
+    date: document.getElementById('f-date').value,
+    name: document.getElementById('f-name').value || '(미입력)',
+    day: document.getElementById('f-day').value,
+    text: document.getElementById('preview').textContent,
+    saved: new Date().toLocaleString('ko-KR')
+  });
+  localStorage.setItem(key, JSON.stringify(logs));
+  renderHistory();
+  toast('저장됐어요!');
+}
+
+function renderHistory() {
+  const key = 'mentee_logs_v2';
+  const logs = JSON.parse(localStorage.getItem(key) || '[]');
+  const sec = document.getElementById('hist-section');
+  const list = document.getElementById('hist-list');
+  if (!logs.length) { sec.classList.remove('show'); return; }
+  sec.classList.add('show');
+  list.innerHTML = '';
+  logs.forEach((l, i) => {
+    const item = document.createElement('div');
+    item.className = 'hist-item';
+    item.innerHTML = `
+      <div>
+        <div class="hist-item-main">${l.date} · ${l.name} ${l.day ? '(' + l.day + ')' : ''}</div>
+        <div class="hist-item-sub">${l.saved}</div>
+      </div>
+      <span class="hist-del" onclick="deleteLog(${i},event)">삭제</span>`;
+    item.onclick = (e) => {
+      if (e.target.classList.contains('hist-del')) return;
+      document.getElementById('preview').textContent = l.text;
+      document.getElementById('preview').classList.add('show');
+      document.getElementById('action-row').classList.add('show');
+      document.getElementById('preview').scrollIntoView({ behavior: 'smooth' });
+    };
+    list.appendChild(item);
+  });
+}
+
+function deleteLog(i, e) {
+  e.stopPropagation();
+  const key = 'mentee_logs_v2';
+  const logs = JSON.parse(localStorage.getItem(key) || '[]');
+  logs.splice(i, 1);
+  localStorage.setItem(key, JSON.stringify(logs));
+  renderHistory();
+}
+
+function resetForm() {
+  ['f-am-work','f-am-note','f-pm-work','f-pm-note','f-next','f-comment'].forEach(id => document.getElementById(id).value = '');
+  document.querySelectorAll('.star').forEach(s => s.classList.remove('on'));
+  Object.keys(starVals).forEach(k => starVals[k] = 0);
+  document.querySelectorAll('.tag').forEach(t => { t.classList.remove('sel-pos','sel-neg'); });
+  document.getElementById('preview').classList.remove('show');
+  document.getElementById('action-row').classList.remove('show');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+renderHistory();
+</script>
+</body>
+</html>
