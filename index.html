@@ -3,475 +3,459 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>멘티 일일 업무 일지 · 오픈웍스</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<title>멘티 업무 대시보드 · 오픈웍스</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 :root{
-  --navy:#1a2744;--blue:#2563eb;--blue-soft:#dbeafe;--blue-mid:#93c5fd;
-  --bg:#f0f4fa;--white:#fff;--gray-1:#f8fafc;--gray-2:#e2e8f0;
-  --gray-3:#94a3b8;--gray-4:#475569;--text:#1e293b;
-  --green:#16a34a;--green-soft:#dcfce7;--red:#dc2626;--red-soft:#fee2e2;
-  --yellow:#d97706;--yellow-soft:#fef3c7;
-  --radius:12px;--shadow:0 4px 32px rgba(37,99,235,.10);
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2335;--surface3:#242840;
+  --blue:#4f8ef7;--blue-dim:#2a4a8a;--blue-glow:rgba(79,142,247,.18);
+  --green:#34d399;--green-dim:#064e3b;
+  --yellow:#fbbf24;--yellow-dim:#78350f;
+  --red:#f87171;--red-dim:#7f1d1d;
+  --purple:#a78bfa;--purple-dim:#3b0764;
+  --border:#2a2f45;--border2:#343a54;
+  --text:#e8eaf6;--text2:#8892b0;--text3:#4a5270;
+  --radius:14px;--radius-sm:8px;
+  --font:'Pretendard',sans-serif;
+  --font-display:'Gowun Batang',serif;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+  --glow:0 0 20px rgba(79,142,247,.15);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 
-/* Header */
-.site-header{background:var(--navy);padding:24px 0 18px;text-align:center;position:relative;overflow:hidden}
-.site-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 20px,rgba(255,255,255,.03) 20px,rgba(255,255,255,.03) 40px)}
-.site-header h1{font-family:'DM Serif Display',serif;font-size:1.7rem;color:#fff;position:relative}
-.site-header p{color:var(--blue-mid);font-size:.82rem;margin-top:4px;font-weight:300;position:relative}
-.sync-status{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;margin-top:6px;position:relative}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#94a3b8}
-.sync-dot.online{background:#4ade80;box-shadow:0 0 6px #4ade80}
-.sync-dot.loading{background:#fbbf24;animation:pulse .8s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* BG mesh */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(79,142,247,.07) 0%,transparent 70%),
+             radial-gradient(ellipse 40% 30% at 80% 80%,rgba(167,139,250,.05) 0%,transparent 60%);
+  pointer-events:none;
+}
 
-.container{max-width:860px;margin:0 auto;padding:0 16px}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
 
-/* Mentee bar */
-.mentee-bar{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 22px;margin-top:20px;border:1px solid rgba(37,99,235,.07)}
-.mentee-bar-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.mentee-bar-title{font-size:.78rem;font-weight:700;color:var(--blue);letter-spacing:1px;text-transform:uppercase}
-.btn-add-mentee{font-family:'Noto Sans KR',sans-serif;font-size:.82rem;font-weight:500;padding:7px 16px;border-radius:8px;cursor:pointer;border:1.5px solid var(--blue);color:var(--blue);background:var(--blue-soft);transition:all .18s}
-.btn-add-mentee:hover{background:var(--blue);color:#fff}
-.mentee-tabs{display:flex;flex-wrap:wrap;gap:8px}
-.mentee-tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:99px;cursor:pointer;font-size:.85rem;font-weight:500;border:1.5px solid var(--gray-2);background:var(--gray-1);color:var(--gray-4);transition:all .2s}
-.mentee-tab.active{border-color:var(--blue);background:var(--blue);color:#fff}
-.mentee-tab:hover:not(.active){border-color:var(--blue-mid);color:var(--blue)}
-.mentee-tab .tab-del{font-size:12px;margin-left:2px;opacity:.6}
-.mentee-count{font-size:.72rem;background:rgba(255,255,255,.25);border-radius:99px;padding:1px 7px;margin-left:2px}
-.mentee-tab:not(.active) .mentee-count{background:var(--blue-soft);color:var(--blue)}
+/* ── Topbar ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;height:60px;
+  background:rgba(24,28,39,.85);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-logo{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#fff;
+}
+.topbar-name{font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.topbar-sub{font-size:.72rem;color:var(--text2);margin-top:1px}
+.sync-pill{
+  display:flex;align-items:center;gap:6px;
+  font-size:.75rem;color:var(--text2);
+  background:var(--surface2);border:1px solid var(--border);
+  padding:5px 12px;border-radius:99px;
+}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3)}
+.sync-dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}
+.sync-dot.loading{background:var(--yellow);animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Card */
-.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 26px;margin-top:20px;border:1px solid rgba(37,99,235,.07);animation:fadeUp .3s ease both}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.card-title{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--blue);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:18px;padding-bottom:12px;border-bottom:1.5px solid var(--blue-soft)}
-.card-title .icon{width:28px;height:28px;background:var(--blue-soft);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+/* ── Nav tabs ── */
+.nav-tabs{
+  display:flex;align-items:center;gap:4px;
+  padding:12px 28px 0;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.nav-tab{
+  font-family:var(--font);font-size:.85rem;font-weight:500;
+  padding:10px 20px;border-radius:10px 10px 0 0;
+  cursor:pointer;color:var(--text2);
+  border:1px solid transparent;border-bottom:none;
+  transition:all .2s;position:relative;top:1px;
+}
+.nav-tab:hover{color:var(--text);background:var(--surface2)}
+.nav-tab.active{color:var(--blue);background:var(--bg);border-color:var(--border);font-weight:600}
 
-/* Form */
+/* ── Mentee selector bar ── */
+.mentee-bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:14px 28px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+}
+.mentee-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:99px;font-size:.82rem;font-weight:500;
+  cursor:pointer;border:1.5px solid var(--border2);color:var(--text2);
+  background:var(--surface2);transition:all .2s;
+}
+.mentee-pill:hover{border-color:var(--blue);color:var(--blue)}
+.mentee-pill.active{border-color:var(--blue);background:var(--blue-dim);color:var(--blue);box-shadow:var(--glow)}
+.mentee-pill .pill-cnt{font-size:.7rem;background:rgba(79,142,247,.2);color:var(--blue);border-radius:99px;padding:1px 7px}
+.mentee-pill.active .pill-cnt{background:rgba(79,142,247,.35)}
+.mentee-pill .pill-del{opacity:.5;font-size:11px;margin-left:2px;transition:opacity .15s}
+.mentee-pill .pill-del:hover{opacity:1}
+.btn-add{
+  font-family:var(--font);font-size:.8rem;font-weight:500;
+  padding:6px 14px;border-radius:99px;cursor:pointer;
+  border:1.5px dashed var(--border2);color:var(--text3);
+  background:transparent;transition:all .18s;
+}
+.btn-add:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── Main content ── */
+.main{flex:1;padding:24px 28px;max-width:1100px;margin:0 auto;width:100%}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── Cards ── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px 24px;
+  box-shadow:var(--shadow);
+}
+.card+.card{margin-top:16px}
+.card-title{
+  font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text2);margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.card-title .ctag{
+  padding:2px 8px;border-radius:4px;font-size:.68rem;font-weight:600;
+  background:var(--blue-dim);color:var(--blue);
+}
+
+/* ── Form elements ── */
 .field{margin-bottom:14px}
 .field:last-child{margin-bottom:0}
-label{display:block;font-size:.75rem;font-weight:500;color:var(--gray-4);margin-bottom:5px}
-input[type="text"],input[type="date"],select,textarea{width:100%;font-family:'Noto Sans KR',sans-serif;font-size:.9rem;color:var(--text);background:var(--gray-1);border:1.5px solid var(--gray-2);border-radius:8px;padding:9px 13px;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;cursor:pointer}
+.field label{display:block;font-size:.73rem;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.3px}
+input[type=text],input[type=date],select,textarea{
+  width:100%;font-family:var(--font);font-size:.88rem;color:var(--text);
+  background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:var(--radius-sm);padding:9px 13px;outline:none;
+  transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238892b0' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:32px;cursor:pointer;
+}
 textarea{resize:vertical;line-height:1.6;min-height:70px}
-input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.10)}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,142,247,.15)}
+input[readonly]{background:var(--bg);cursor:not-allowed;color:var(--text2)}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 
-/* 업무 섹션 */
-.task-section{margin-bottom:20px;border:1.5px solid var(--gray-2);border-radius:10px;overflow:hidden}
-.task-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gray-1);cursor:pointer;transition:background .15s;user-select:none}
-.task-header:hover{background:var(--blue-soft)}
-.task-header-left{display:flex;align-items:center;gap:10px}
-.task-num{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.task-name{font-size:.9rem;font-weight:600;color:var(--text)}
-.task-score-badge{font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--gray-2);color:var(--gray-4)}
-.task-score-badge.s-high{background:var(--green-soft);color:var(--green)}
-.task-score-badge.s-mid{background:var(--yellow-soft);color:var(--yellow)}
-.task-score-badge.s-low{background:var(--red-soft);color:var(--red)}
-.task-arrow{font-size:.75rem;color:var(--gray-3);transition:transform .2s}
-.task-body{display:none;padding:14px 16px;border-top:1px solid var(--gray-2)}
+/* ── Task sections ── */
+.task-block{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.task-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:var(--surface2);cursor:pointer;
+  transition:background .15s;user-select:none;
+}
+.task-head:hover{background:var(--surface3)}
+.task-head-l{display:flex;align-items:center;gap:10px}
+.task-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--blue-dim);color:var(--blue);
+  font-size:.72rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.task-label{font-size:.88rem;font-weight:600;color:var(--text)}
+.task-badge{font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--surface3);color:var(--text3)}
+.task-badge.hi{background:rgba(52,211,153,.15);color:var(--green)}
+.task-badge.mid{background:rgba(251,191,36,.15);color:var(--yellow)}
+.task-badge.lo{background:rgba(248,113,113,.15);color:var(--red)}
+.task-arrow{font-size:.7rem;color:var(--text3);transition:transform .2s}
+.task-arrow.open{transform:rotate(180deg)}
+.task-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}
 .task-body.open{display:block}
 
-/* 체크리스트 */
-.check-items{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--gray-2);background:var(--gray-1);cursor:pointer;transition:all .15s}
-.check-item:hover{border-color:var(--blue-mid)}
-.check-item.checked{border-color:var(--green);background:var(--green-soft)}
-.check-item.checked .check-box{background:var(--green);border-color:var(--green)}
-.check-item.checked .check-box::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
-.check-item.na{border-color:var(--gray-3);background:#f1f5f9;opacity:.6}
-.check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(--gray-3);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s}
-.check-label{font-size:.85rem;color:var(--text);line-height:1.4;flex:1}
-.check-sub{font-size:.75rem;color:var(--gray-3);margin-top:2px}
+/* Check items */
+.check-list{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.check-item{
+  display:flex;align-items:flex-start;gap:10px;padding:9px 12px;
+  border-radius:8px;border:1px solid var(--border);background:var(--bg);
+  cursor:pointer;transition:all .15s;
+}
+.check-item:hover{border-color:var(--blue);background:var(--surface2)}
+.check-item.chk{border-color:var(--green);background:rgba(52,211,153,.07)}
+.check-item.chk .chk-box{background:var(--green);border-color:var(--green)}
+.check-item.chk .chk-box::after{content:'✓';color:#fff;font-size:10px;font-weight:800}
+.chk-box{
+  width:18px;height:18px;border-radius:4px;
+  border:2px solid var(--border2);background:var(--surface2);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;transition:all .15s;
+}
+.chk-label{font-size:.83rem;color:var(--text);line-height:1.4}
+.chk-sub{font-size:.72rem;color:var(--text3);margin-top:2px}
 
-/* 수행도 라디오 */
-.perf-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.perf-btn{padding:5px 14px;border-radius:99px;font-size:.8rem;font-weight:500;cursor:pointer;border:1.5px solid var(--gray-2);background:var(--gray-1);color:var(--gray-4);transition:all .15s;user-select:none}
-.perf-btn:hover{border-color:var(--blue-mid)}
-.perf-btn.sel-5{background:#dcfce7;border-color:#86efac;color:#16a34a}
-.perf-btn.sel-4{background:#d1fae5;border-color:#6ee7b7;color:#059669}
-.perf-btn.sel-3{background:#fef3c7;border-color:#fcd34d;color:#d97706}
-.perf-btn.sel-2{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
-.perf-btn.sel-1{background:#fce7f3;border-color:#f9a8d4;color:#be185d}
+/* Perf buttons */
+.perf-label{font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:7px;letter-spacing:.3px}
+.perf-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.perf-btn{
+  padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:500;
+  cursor:pointer;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text2);
+  transition:all .15s;user-select:none;
+}
+.perf-btn:hover{border-color:var(--blue)}
+.p5{background:rgba(52,211,153,.15)!important;border-color:var(--green)!important;color:var(--green)!important}
+.p4{background:rgba(79,142,247,.15)!important;border-color:var(--blue)!important;color:var(--blue)!important}
+.p3{background:rgba(251,191,36,.15)!important;border-color:var(--yellow)!important;color:var(--yellow)!important}
+.p2{background:rgba(248,113,113,.15)!important;border-color:var(--red)!important;color:var(--red)!important}
+.p1{background:rgba(167,139,250,.15)!important;border-color:var(--purple)!important;color:var(--purple)!important}
 
-.task-comment{font-size:.85rem}
+/* Summary scores */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.sum-box{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  padding:14px 16px;text-align:center;
+}
+.sum-box-label{font-size:.7rem;color:var(--text3);margin-bottom:6px;letter-spacing:.3px}
+.sum-box-val{font-size:1.7rem;font-weight:700;color:var(--blue);line-height:1}
+.sum-box-max{font-size:.7rem;color:var(--text3);margin-top:3px}
+.sum-box.grade .sum-box-val{
+  font-size:2rem;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
 
-/* 종합 코멘트 */
-.summary-score{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.score-box{background:var(--gray-1);border:1.5px solid var(--gray-2);border-radius:10px;padding:12px;text-align:center}
-.score-box-label{font-size:.72rem;color:var(--gray-4);margin-bottom:6px}
-.score-box-val{font-size:1.5rem;font-weight:700;color:var(--blue)}
-.score-box-max{font-size:.72rem;color:var(--gray-3)}
+/* Btn */
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.btn{
+  font-family:var(--font);font-size:.85rem;font-weight:600;
+  padding:10px 22px;border-radius:var(--radius-sm);cursor:pointer;
+  border:none;transition:all .18s;
+}
+.btn-ghost{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
+.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(79,142,247,.3)}
+.btn-primary:hover{background:#3a7ae8;transform:translateY(-1px)}
 
-/* 버튼 */
-.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-.btn{font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:500;padding:11px 24px;border-radius:8px;cursor:pointer;border:none;transition:all .18s}
-.btn-ghost{background:transparent;border:1.5px solid var(--gray-2);color:var(--gray-4)}
-.btn-ghost:hover{border-color:var(--blue-mid);color:var(--blue)}
-.btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(37,99,235,.25)}
-.btn-primary:hover{background:#1d4ed8;transform:translateY(-1px)}
-
-/* 미리보기 */
-.preview-box{display:none;background:var(--navy);color:#e2e8f0;font-family:monospace;font-size:.82rem;line-height:1.9;border-radius:10px;padding:22px 24px;margin-top:20px;white-space:pre-wrap;word-break:break-all}
+/* Preview */
+.preview-box{
+  display:none;background:#0a0d16;color:#a8b2d8;
+  font-family:'Courier New',monospace;font-size:.8rem;line-height:1.9;
+  border-radius:10px;padding:20px 22px;margin-top:16px;
+  white-space:pre-wrap;word-break:break-all;
+  border:1px solid var(--border);
+}
 .preview-box.show{display:block}
 .action-row{display:none;gap:10px;margin-top:10px;justify-content:flex-end}
 .action-row.show{display:flex}
 
-/* 캘린더 */
-.calendar-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 26px;margin-top:20px;border:1px solid rgba(37,99,235,.07)}
-.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.cal-title{font-size:1rem;font-weight:700;color:var(--text)}
-.cal-nav{display:flex;gap:8px}
-.cal-nav button{font-family:'Noto Sans KR',sans-serif;background:var(--gray-1);border:1.5px solid var(--gray-2);border-radius:7px;padding:5px 13px;cursor:pointer;color:var(--gray-4);transition:all .15s}
-.cal-nav button:hover{border-color:var(--blue-mid);color:var(--blue)}
+/* ── Calendar tab ── */
+.cal-layout{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+.cal-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+.cal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.cal-title{font-size:.95rem;font-weight:700;color:var(--text)}
+.cal-nav-btns{display:flex;gap:7px}
+.cal-nav-btn{
+  font-family:var(--font);font-size:.78rem;background:var(--surface2);
+  border:1px solid var(--border);border-radius:6px;
+  padding:5px 12px;cursor:pointer;color:var(--text2);transition:all .15s;
+}
+.cal-nav-btn:hover{border-color:var(--blue);color:var(--blue)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cal-day-label{text-align:center;font-size:.72rem;font-weight:700;color:var(--gray-3);padding:4px 0;letter-spacing:.5px}
-.cal-day-label:first-child{color:#ef4444}
-.cal-day-label:last-child{color:#3b82f6}
-.cal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:default;font-size:.85rem;color:var(--gray-4);position:relative;transition:all .15s}
-.cal-cell.has-log{background:var(--blue-soft);color:var(--blue);cursor:pointer;font-weight:700}
+.cal-dlabel{text-align:center;font-size:.68rem;font-weight:700;color:var(--text3);padding:4px 0;letter-spacing:.5px}
+.cal-dlabel:first-child{color:var(--red)}
+.cal-dlabel:last-child{color:var(--blue)}
+.cal-cell{
+  aspect-ratio:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  border-radius:8px;font-size:.82rem;color:var(--text3);
+  position:relative;transition:all .15s;
+}
+.cal-cell.today{border:1.5px solid var(--blue);color:var(--blue);font-weight:700}
+.cal-cell.has-log{
+  background:var(--blue-dim);color:var(--blue);
+  cursor:pointer;font-weight:700;
+}
 .cal-cell.has-log:hover{background:var(--blue);color:#fff}
-.cal-cell.today{border:2px solid var(--blue)}
-.cal-cell.empty{opacity:0}
-.cal-cell .cal-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);position:absolute;bottom:4px}
-.cal-cell.has-log .cal-dot{background:var(--blue)}
-.cal-cell.has-log:hover .cal-dot{background:#fff}
+.cal-cell .cdot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--blue);position:absolute;bottom:4px;
+}
+.cal-cell.has-log:hover .cdot{background:#fff}
+.cal-cell.empty{opacity:0;pointer-events:none}
 
-/* 기록 뷰어 모달 */
-.log-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
-.log-modal-bg.show{display:flex}
-.log-modal{background:#fff;border-radius:16px;width:100%;max-width:600px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)}
-.log-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--gray-2);position:sticky;top:0;background:#fff;z-index:1}
-.log-modal-title{font-size:1rem;font-weight:700;color:var(--text)}
-.log-modal-close{font-size:1.2rem;cursor:pointer;color:var(--gray-3);padding:4px 8px;border-radius:6px;transition:all .15s}
-.log-modal-close:hover{background:var(--gray-2);color:var(--text)}
-.log-modal-body{padding:20px 24px}
-.log-entry{background:var(--navy);color:#e2e8f0;font-family:monospace;font-size:.8rem;line-height:1.9;border-radius:10px;padding:18px 20px;white-space:pre-wrap;word-break:break-all;margin-bottom:12px}
-.log-entry-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.log-entry-date{font-size:.8rem;color:var(--gray-3)}
-.log-del-btn{font-size:.75rem;color:var(--red);padding:3px 10px;border-radius:5px;border:1px solid #fca5a5;background:var(--red-soft);cursor:pointer}
+.cal-detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+.cal-detail-title{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:14px}
+.cal-detail-empty{font-size:.82rem;color:var(--text3);text-align:center;padding:32px 0}
+.log-entry-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:8px;padding:12px 14px;margin-bottom:10px;
+}
+.log-entry-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.log-entry-name{font-size:.78rem;font-weight:600;color:var(--blue)}
+.log-entry-time{font-size:.72rem;color:var(--text3)}
+.log-entry-txt{
+  background:var(--bg);border-radius:6px;padding:10px 12px;
+  font-family:'Courier New',monospace;font-size:.75rem;color:#8892b0;
+  line-height:1.7;max-height:180px;overflow-y:auto;white-space:pre-wrap;
+}
+.log-del-btn{font-size:.7rem;color:var(--red);padding:2px 8px;border-radius:4px;border:1px solid rgba(248,113,113,.3);background:rgba(248,113,113,.08);cursor:pointer;margin-left:8px}
 
-/* 멘티 모달 */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+/* ── Stats tab ── */
+.stats-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.stats-title{font-size:1.1rem;font-weight:700;color:var(--text)}
+.period-tabs{display:flex;gap:6px}
+.period-tab{
+  font-family:var(--font);font-size:.78rem;font-weight:600;
+  padding:6px 16px;border-radius:99px;cursor:pointer;
+  border:1.5px solid var(--border2);color:var(--text2);
+  background:transparent;transition:all .18s;
+}
+.period-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px 20px;
+}
+.stat-card-label{font-size:.7rem;color:var(--text3);letter-spacing:.5px;margin-bottom:8px}
+.stat-card-val{font-size:1.8rem;font-weight:700;color:var(--text);line-height:1}
+.stat-card-sub{font-size:.72rem;color:var(--text3);margin-top:5px}
+.stat-card-trend{font-size:.75rem;font-weight:600}
+.stat-card-trend.up{color:var(--green)}
+.stat-card-trend.dn{color:var(--red)}
+
+.mentee-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mentee-stat-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px 22px;
+}
+.msc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.msc-name{font-size:.95rem;font-weight:700;color:var(--text)}
+.msc-grade{
+  font-size:1.1rem;font-weight:800;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.msc-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.msc-item{text-align:center;background:var(--surface2);border-radius:8px;padding:10px 8px}
+.msc-item-label{font-size:.65rem;color:var(--text3);margin-bottom:4px}
+.msc-item-val{font-size:1.1rem;font-weight:700;color:var(--blue)}
+
+/* Task bar chart */
+.task-bars{display:flex;flex-direction:column;gap:8px}
+.task-bar-row{display:flex;align-items:center;gap:10px}
+.task-bar-label{font-size:.72rem;color:var(--text2);width:110px;flex-shrink:0;text-align:right}
+.task-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.task-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--purple));transition:width .6s ease}
+.task-bar-val{font-size:.72rem;color:var(--text2);width:36px;flex-shrink:0}
+
+/* no data */
+.no-data{text-align:center;padding:48px 0;color:var(--text3);font-size:.88rem}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center}
 .modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:16px;padding:28px 28px 24px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,.18)}
-.modal h3{font-size:1rem;font-weight:700;margin-bottom:16px}
-.modal input{width:100%;font-family:'Noto Sans KR',sans-serif;font-size:.9rem;border:1.5px solid var(--gray-2);border-radius:8px;padding:10px 14px;outline:none;transition:border-color .2s}
-.modal input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.10)}
-.modal-btns{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px 28px;width:340px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.modal h3{font-size:.95rem;font-weight:700;margin-bottom:14px;color:var(--text)}
+.modal input{width:100%;font-family:var(--font);font-size:.88rem;color:var(--text);background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:9px 13px;outline:none;transition:border-color .2s}
+.modal input:focus{border-color:var(--blue)}
+.modal-btns{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
 
 /* Toast */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy);color:#fff;padding:11px 24px;border-radius:99px;font-size:.85rem;font-weight:500;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px 22px;border-radius:99px;font-size:.83rem;font-weight:500;opacity:0;transition:all .25s;pointer-events:none;z-index:999;white-space:nowrap;box-shadow:var(--shadow)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+@media(max-width:900px){
+  .cal-layout{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .mentee-stats-grid{grid-template-columns:1fr}
+  .sum-grid{grid-template-columns:1fr 1fr}
+}
 @media(max-width:600px){
-  .grid-3,.grid-2{grid-template-columns:1fr}
-  .summary-score{grid-template-columns:1fr 1fr}
-  .card,.calendar-wrap{padding:18px 14px}
-  .site-header h1{font-size:1.35rem}
+  .topbar,.nav-tabs,.mentee-bar,.main{padding-left:16px;padding-right:16px}
+  .grid3,.grid2{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .sum-grid{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
+<div class="app">
 
-<div class="site-header">
-  <h1>멘티 일일 업무 일지</h1>
-  <p>(주)오픈웍스 · 스마트기술팀 · 멘토 기록용</p>
-  <div class="sync-status">
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">오</div>
+    <div>
+      <div class="topbar-name">멘티 업무 대시보드</div>
+      <div class="topbar-sub">(주)오픈웍스 · 스마트기술팀</div>
+    </div>
+  </div>
+  <div class="sync-pill">
     <div class="sync-dot loading" id="sync-dot"></div>
-    <span id="sync-text" style="color:var(--blue-mid)">연결 중...</span>
+    <span id="sync-text">연결 중</span>
   </div>
 </div>
 
-<div class="container">
+<!-- Nav tabs -->
+<div class="nav-tabs">
+  <div class="nav-tab active" onclick="switchMainTab('write',this)">✏️ 업무일지 작성</div>
+  <div class="nav-tab" onclick="switchMainTab('calendar',this)">📅 캘린더</div>
+  <div class="nav-tab" onclick="switchMainTab('stats',this)">📊 통계</div>
+</div>
 
-  <!-- 멘티 탭 -->
-  <div class="mentee-bar">
-    <div class="mentee-bar-top">
-      <div class="mentee-bar-title">👥 멘티 선택</div>
-      <button class="btn-add-mentee" onclick="openAddModal()">+ 멘티 추가</button>
-    </div>
-    <div class="mentee-tabs" id="mentee-tabs">
-      <span style="font-size:.83rem;color:var(--gray-3)">불러오는 중...</span>
-    </div>
-  </div>
+<!-- Mentee bar -->
+<div class="mentee-bar" id="mentee-bar">
+  <span style="font-size:.78rem;color:var(--text3)">불러오는 중...</span>
+</div>
 
-  <!-- 작성 폼 -->
-  <div id="form-section">
+<!-- Main -->
+<div class="main">
 
-    <!-- 기본 정보 -->
+  <!-- ══ TAB: 업무일지 작성 ══ -->
+  <div class="tab-panel active" id="panel-write">
+
+    <!-- 기본정보 -->
     <div class="card">
-      <div class="card-title"><span class="icon">📋</span> 기본 정보</div>
-      <div class="grid-3">
+      <div class="card-title">📋 기본 정보</div>
+      <div class="grid3">
         <div class="field"><label>날짜</label><input type="date" id="f-date"></div>
-        <div class="field"><label>멘티 이름</label><input type="text" id="f-name" readonly style="background:#f1f5f9;cursor:not-allowed"></div>
+        <div class="field"><label>멘티 이름</label><input type="text" id="f-name" readonly></div>
         <div class="field"><label>근무일수</label>
           <select id="f-day">
             <option value="">선택</option>
-            <option>1일차</option><option>2일차</option><option>3일차</option><option>4일차</option><option>5일차</option>
+            <option>1일차</option><option>2일차</option><option>3일차</option>
+            <option>4일차</option><option>5일차</option>
             <option>2주차</option><option>3주차</option><option>4주차</option>
           </select>
         </div>
       </div>
-      <div class="grid-2" style="margin-top:13px">
+      <div class="grid2" style="margin-top:12px">
         <div class="field"><label>멘토 이름</label><input type="text" id="f-mentor" placeholder="예) 김수현"></div>
         <div class="field"><label>부서</label><input type="text" id="f-dept" value="스마트기술팀"></div>
       </div>
     </div>
 
-    <!-- 7개 업무 체크리스트 -->
-    <div class="card">
-      <div class="card-title"><span class="icon">✅</span> 업무별 체크리스트 평가</div>
-
-      <!-- ① 신규 영업 TM -->
-      <div class="task-section" id="task-0">
-        <div class="task-header" onclick="toggleTask(0)">
-          <div class="task-header-left">
-            <div class="task-num">①</div>
-            <div class="task-name">신규 영업 TM</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-0">미평가</span>
-            <span class="task-arrow" id="arrow-0">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-0">
-          <div class="check-items" id="checks-0">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">후빌즈를 통해 신규 현장 발굴 및 콜 리스트 정리</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">아웃바운드 신규 영업콜 20건 진행</div><div class="check-sub">목표: 하루 20건</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">제품·서비스 정확히 설명 및 고객 니즈 파악</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">노션 영업일지에 20건 누락 없이 작성</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-0">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(0,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(0,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(0,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(0,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(0,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-0" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- ② 유지보수 응대 -->
-      <div class="task-section" id="task-1">
-        <div class="task-header" onclick="toggleTask(1)">
-          <div class="task-header-left">
-            <div class="task-num">②</div>
-            <div class="task-name">유지보수 응대</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-1">미평가</span>
-            <span class="task-arrow" id="arrow-1">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-1">
-          <div class="check-items" id="checks-1">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">인바운드 유지보수 콜 신속·정확 응대 (목표 5건)</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">고객 문의 파악 및 1차 기술 대응</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">유지보수 처리 후 업무일지 작성</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">유지보수 일지 작성 (증상·원인·조치·결과)</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">해결 어려운 건 기술지원팀 신속 이관</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-1">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(1,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(1,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(1,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(1,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(1,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-1" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- ③ 사무실 전화 응대 -->
-      <div class="task-section" id="task-2">
-        <div class="task-header" onclick="toggleTask(2)">
-          <div class="task-header-left">
-            <div class="task-num">③</div>
-            <div class="task-name">사무실 전화 응대</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-2">미평가</span>
-            <span class="task-arrow" id="arrow-2">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-2">
-          <div class="check-items" id="checks-2">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">대표전화 예의 바르게 응대</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">문의 내용 정확히 듣고 담당자 연결 또는 메모 전달</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">부재 시 콜백 책임지고 처리</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-2">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(2,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(2,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(2,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(2,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(2,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-2" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- ④ 견적 -->
-      <div class="task-section" id="task-3">
-        <div class="task-header" onclick="toggleTask(3)">
-          <div class="task-header-left">
-            <div class="task-num">④</div>
-            <div class="task-name">견적</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-3">미평가</span>
-            <span class="task-arrow" id="arrow-3">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-3">
-          <div class="check-items" id="checks-3">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">유형별(신규/이전/철거) 견적서 정확히 작성</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">단가·수량·산출근거 검토 및 오류 없음 확인</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">견적서 발송 후 고객 협의·조율 및 마감 준수</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-3">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(3,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(3,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(3,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(3,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(3,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-3" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- ⑤ 발주 -->
-      <div class="task-section" id="task-4">
-        <div class="task-header" onclick="toggleTask(4)">
-          <div class="task-header-left">
-            <div class="task-num">⑤</div>
-            <div class="task-name">발주</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-4">미평가</span>
-            <span class="task-arrow" id="arrow-4">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-4">
-          <div class="check-items" id="checks-4">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">품목·규격·수량·납기 정확히 기재한 구매요청서 작성</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">단가·재고·납기 검토 및 사내 승인 절차 이행</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">발주 후 입고 확인</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-4">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(4,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(4,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(4,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(4,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(4,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-4" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- ⑥ 시공관리 -->
-      <div class="task-section" id="task-5">
-        <div class="task-header" onclick="toggleTask(5)">
-          <div class="task-header-left">
-            <div class="task-num">⑥</div>
-            <div class="task-name">시공관리</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-5">미평가</span>
-            <span class="task-arrow" id="arrow-5">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-5">
-          <div class="check-items" id="checks-5">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">현장 시공 일정 협의·조율</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">작업지시서 구체적으로 작성 및 시공팀 전달</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">시공팀과 지속 협업 및 변경사항 대응</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">완료 확인까지 책임</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-5">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(5,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(5,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(5,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(5,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(5,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-5" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-      <!-- ⑦ 제안서 및 자료 작성 -->
-      <div class="task-section" id="task-6">
-        <div class="task-header" onclick="toggleTask(6)">
-          <div class="task-header-left">
-            <div class="task-num">⑦</div>
-            <div class="task-name">제안서 및 자료 작성</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="task-score-badge" id="badge-6">미평가</span>
-            <span class="task-arrow" id="arrow-6">▼</span>
-          </div>
-        </div>
-        <div class="task-body" id="body-6">
-          <div class="check-items" id="checks-6">
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">현장 필요 자료 및 제안서 논리적·설득력 있게 작성</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">기술 사양·시스템 이해 반영 여부 확인</div></div></div>
-            <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><div><div class="check-label">검수 후 적시 발송</div></div></div>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:.75rem;font-weight:600;color:var(--gray-4);margin-bottom:6px">수행도</div>
-            <div class="perf-row" id="perf-6">
-              <span class="perf-btn" data-v="5" onclick="selectPerf(6,5,this)">매우 우수 (5)</span>
-              <span class="perf-btn" data-v="4" onclick="selectPerf(6,4,this)">우수 (4)</span>
-              <span class="perf-btn" data-v="3" onclick="selectPerf(6,3,this)">보통 (3)</span>
-              <span class="perf-btn" data-v="2" onclick="selectPerf(6,2,this)">미흡 (2)</span>
-              <span class="perf-btn" data-v="1" onclick="selectPerf(6,1,this)">불이행 (1)</span>
-            </div>
-          </div>
-          <textarea class="task-comment" id="comment-6" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2"></textarea>
-        </div>
-      </div>
-
-    </div><!-- end card -->
+    <!-- 업무 체크리스트 -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">✅ 업무별 체크리스트 <span class="ctag">7개 영역</span></div>
+      <div id="task-list"></div>
+    </div>
 
     <!-- 종합 -->
-    <div class="card">
-      <div class="card-title"><span class="icon">📊</span> 오늘의 종합</div>
-      <div class="summary-score">
-        <div class="score-box"><div class="score-box-label">평가 업무 수</div><div class="score-box-val" id="sum-count">0</div><div class="score-box-max">/ 7개</div></div>
-        <div class="score-box"><div class="score-box-label">체크 완료율</div><div class="score-box-val" id="sum-check">0%</div><div class="score-box-max">전체 항목 대비</div></div>
-        <div class="score-box"><div class="score-box-label">수행도 평균</div><div class="score-box-val" id="sum-perf">-</div><div class="score-box-max">/ 5점</div></div>
-        <div class="score-box"><div class="score-box-label">종합 등급</div><div class="score-box-val" id="sum-grade">-</div><div class="score-box-max"></div></div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">📊 오늘의 종합</div>
+      <div class="sum-grid">
+        <div class="sum-box"><div class="sum-box-label">평가 업무 수</div><div class="sum-box-val" id="sum-count">0</div><div class="sum-box-max">/ 7개</div></div>
+        <div class="sum-box"><div class="sum-box-label">체크 완료율</div><div class="sum-box-val" id="sum-check">0%</div><div class="sum-box-max">전체 항목 대비</div></div>
+        <div class="sum-box"><div class="sum-box-label">수행도 평균</div><div class="sum-box-val" id="sum-perf">-</div><div class="sum-box-max">/ 5점</div></div>
+        <div class="sum-box grade"><div class="sum-box-label">종합 등급</div><div class="sum-box-val" id="sum-grade">-</div><div class="sum-box-max"></div></div>
       </div>
-      <div class="field" style="margin-top:4px">
-        <label>멘토 종합 코멘트 <span style="font-size:.72rem;color:var(--gray-3)">(상무님 보고용)</span></label>
-        <textarea id="f-comment" rows="4" placeholder="전반적인 하루 평가 및 특이사항, 상무님께 보고할 내용을 기록해주세요"></textarea>
+      <div class="field"><label>멘토 종합 코멘트 <span style="color:var(--text3);font-weight:400">(상무님 보고용)</span></label>
+        <textarea id="f-comment" rows="3" placeholder="전반적인 하루 평가 및 상무님께 보고할 내용"></textarea>
       </div>
-      <div class="field">
-        <label>내일 예정 / 인수인계</label>
+      <div class="field"><label>내일 예정 / 인수인계</label>
         <textarea id="f-next" rows="2" placeholder="내일 진행할 업무 또는 이어서 안내할 내용"></textarea>
       </div>
     </div>
@@ -480,7 +464,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff
       <button class="btn btn-ghost" onclick="resetForm()">초기화</button>
       <button class="btn btn-primary" onclick="generateLog()">📄 일지 생성</button>
     </div>
-
     <div class="preview-box" id="preview"></div>
     <div class="action-row" id="action-row">
       <button class="btn btn-ghost" onclick="copyLog()">📋 복사</button>
@@ -489,204 +472,257 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff
     </div>
   </div>
 
-  <!-- 캘린더 -->
-  <div class="calendar-wrap" id="cal-wrap" style="display:none">
-    <div class="card-title" style="margin-bottom:0;border:none;padding-bottom:0"><span class="icon">📅</span> 기록 캘린더</div>
-    <div style="margin-top:16px">
-      <div class="cal-header">
-        <div class="cal-title" id="cal-title"></div>
-        <div class="cal-nav">
-          <button onclick="changeMonth(-1)">◀ 이전</button>
-          <button onclick="changeMonth(1)">다음 ▶</button>
+  <!-- ══ TAB: 캘린더 ══ -->
+  <div class="tab-panel" id="panel-calendar">
+    <div class="cal-layout">
+      <div class="cal-wrap">
+        <div class="cal-hd">
+          <div class="cal-title" id="cal-title"></div>
+          <div class="cal-nav-btns">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">◀ 이전</button>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">다음 ▶</button>
+          </div>
         </div>
+        <div class="cal-grid" id="cal-grid"></div>
       </div>
-      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-detail">
+        <div class="cal-detail-title" id="cal-detail-title">날짜를 선택하세요</div>
+        <div id="cal-detail-body"><div class="cal-detail-empty">📅<br>날짜를 클릭하면<br>해당 일의 기록이 표시됩니다</div></div>
+      </div>
     </div>
   </div>
 
-</div>
-
-<!-- 기록 뷰어 모달 -->
-<div class="log-modal-bg" id="log-modal-bg">
-  <div class="log-modal">
-    <div class="log-modal-header">
-      <div class="log-modal-title" id="log-modal-title">기록 보기</div>
-      <span class="log-modal-close" onclick="closeLogModal()">✕</span>
+  <!-- ══ TAB: 통계 ══ -->
+  <div class="tab-panel" id="panel-stats">
+    <div class="stats-header">
+      <div class="stats-title">업무 통계</div>
+      <div class="period-tabs">
+        <button class="period-tab active" onclick="switchPeriod('week',this)">주간</button>
+        <button class="period-tab" onclick="switchPeriod('month',this)">월간</button>
+        <button class="period-tab" onclick="switchPeriod('all',this)">전체</button>
+      </div>
     </div>
-    <div class="log-modal-body" id="log-modal-body"></div>
+    <div id="stats-content"><div class="no-data">멘티를 선택하면 통계가 표시됩니다</div></div>
   </div>
-</div>
+
+</div><!-- main -->
+</div><!-- app -->
 
 <!-- 멘티 추가 모달 -->
 <div class="modal-bg" id="modal-bg">
   <div class="modal">
     <h3>멘티 추가</h3>
-    <input type="text" id="modal-input" placeholder="멘티 이름 입력 (예: 원동건)" maxlength="20"
-      onkeydown="if(event.key==='Enter')addMentee()">
+    <input type="text" id="modal-input" placeholder="멘티 이름 (예: 원동건)" maxlength="20" onkeydown="if(event.key==='Enter')addMentee()">
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeModal()">취소</button>
       <button class="btn btn-primary" onclick="addMentee()">추가</button>
     </div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAPQgmYqS1bWYwFmJzl-SsBvqWM-yy6TIo",
-  authDomain: "mentee-log.firebaseapp.com",
-  databaseURL: "https://mentee-log-default-rtdb.firebaseio.com",
-  projectId: "mentee-log",
-  storageBucket: "mentee-log.firebasestorage.app",
-  messagingSenderId: "791935539817",
-  appId: "1:791935539817:web:f3617e8213e4d4935660f8"
+const FB = {
+  apiKey:"AIzaSyAPQgmYqS1bWYwFmJzl-SsBvqWM-yy6TIo",
+  authDomain:"mentee-log.firebaseapp.com",
+  databaseURL:"https://mentee-log-default-rtdb.firebaseio.com",
+  projectId:"mentee-log",
+  storageBucket:"mentee-log.firebasestorage.app",
+  messagingSenderId:"791935539817",
+  appId:"1:791935539817:web:f3617e8213e4d4935660f8"
 };
-
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(FB);
 const db = getDatabase(app);
 
-const TASK_NAMES = ['신규 영업 TM','유지보수 응대','사무실 전화 응대','견적','발주','시공관리','제안서 및 자료 작성'];
-const TOTAL_CHECKS = [4,5,3,3,3,4,3];
-const perfVals = Array(7).fill(0);
+// ── 상수 ──
+const TASKS = [
+  {name:'신규 영업 TM', checks:['후빌즈를 통해 신규 현장 발굴 및 콜 리스트 정리','아웃바운드 영업콜 20건 진행','제품·서비스 정확히 설명 및 고객 니즈 파악','노션 영업일지에 20건 누락 없이 작성']},
+  {name:'유지보수 응대', checks:['인바운드 유지보수 콜 신속·정확 응대 (목표 5건)','고객 문의 파악 및 1차 기술 대응','유지보수 처리 후 업무일지 작성','유지보수 일지 작성 (증상·원인·조치·결과)','해결 어려운 건 기술지원팀 신속 이관']},
+  {name:'사무실 전화 응대', checks:['대표전화 예의 바르게 응대','문의 내용 정확히 듣고 담당자 연결 또는 메모 전달','부재 시 콜백 책임지고 처리']},
+  {name:'견적', checks:['유형별(신규/이전/철거) 견적서 정확히 작성','단가·수량·산출근거 검토 및 오류 없음 확인','견적서 발송 후 고객 협의·조율 및 마감 준수']},
+  {name:'발주', checks:['품목·규격·수량·납기 정확히 기재한 구매요청서 작성','단가·재고·납기 검토 및 사내 승인 절차 이행','발주 후 입고 확인']},
+  {name:'시공관리', checks:['현장 시공 일정 협의·조율','작업지시서 구체적으로 작성 및 시공팀 전달','시공팀과 지속 협업 및 변경사항 대응','완료 확인까지 책임']},
+  {name:'제안서 및 자료 작성', checks:['현장 필요 자료 및 제안서 논리적·설득력 있게 작성','기술 사양·시스템 이해 반영 여부 확인','검수 후 적시 발송']},
+];
+const NUMS = ['①','②','③','④','⑤','⑥','⑦'];
+const PERF_LABEL = {5:'매우 우수',4:'우수',3:'보통',2:'미흡',1:'불이행',0:'미평가'};
+
+// ── 상태 ──
 let activeMentee = null;
 let menteeList = [];
+let perfVals = Array(7).fill(0);
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
-let calLogDates = {};
+let calLogs = {}; // date -> [{key,..}]
+let statsPeriod = 'week';
+let currentTab = 'write';
 
-// Init
+// ── Init ──
 document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+buildTaskList();
 
-// Firebase 멘티 구독
-onValue(ref(db,'mentees'), snap=>{
-  document.getElementById('sync-dot').className='sync-dot online';
-  document.getElementById('sync-text').textContent='공유 중';
-  const data=snap.val()||{};
-  menteeList=Object.keys(data);
-  renderMenteeTabs();
-},(e)=>{
-  document.getElementById('sync-dot').className='sync-dot';
-  document.getElementById('sync-text').textContent='오프라인';
+// ── Firebase ──
+onValue(ref(db,'mentees'), snap => {
+  document.getElementById('sync-dot').className = 'sync-dot on';
+  document.getElementById('sync-text').textContent = '공유 중';
+  const data = snap.val() || {};
+  menteeList = Object.keys(data);
+  renderMenteeBar();
+}, () => {
+  document.getElementById('sync-dot').className = 'sync-dot';
+  document.getElementById('sync-text').textContent = '오프라인';
 });
 
-function renderMenteeTabs(){
-  const container=document.getElementById('mentee-tabs');
-  container.innerHTML='';
+function renderMenteeBar(){
+  const bar = document.getElementById('mentee-bar');
+  bar.innerHTML = '';
+  const addBtn = document.createElement('button');
+  addBtn.className='btn-add'; addBtn.textContent='+ 멘티 추가';
+  addBtn.onclick = openAddModal;
+  bar.appendChild(addBtn);
   if(!menteeList.length){
-    container.innerHTML='<span style="font-size:.83rem;color:var(--gray-3)">아직 등록된 멘티가 없어요. 멘티를 추가해주세요!</span>';
-    document.getElementById('cal-wrap').style.display='none';
-    return;
+    const sp=document.createElement('span');
+    sp.style.cssText='font-size:.78rem;color:var(--text3);margin-left:8px';
+    sp.textContent='멘티를 추가해주세요';
+    bar.appendChild(sp); return;
   }
-  menteeList.forEach(name=>{
-    const tab=document.createElement('div');
-    tab.className='mentee-tab'+(activeMentee===name?' active':'');
-    tab.innerHTML=`<span>${name}</span><span class="mentee-count" id="cnt-${name}">...</span><span class="tab-del" title="삭제" data-name="${name}">✕</span>`;
-    tab.querySelector('.tab-del').onclick=(e)=>{e.stopPropagation();deleteMentee(name);};
-    tab.onclick=(e)=>{if(e.target.classList.contains('tab-del'))return;selectMentee(name);};
-    container.appendChild(tab);
-    get(ref(db,`logs/${name}`)).then(s=>{
-      const cnt=s.exists()?Object.keys(s.val()).length:0;
-      const el=document.getElementById(`cnt-${name}`);
-      if(el)el.textContent=cnt;
+  menteeList.forEach(name => {
+    const pill = document.createElement('div');
+    pill.className = 'mentee-pill' + (activeMentee===name?' active':'');
+    pill.innerHTML = `<span>${name}</span><span class="pill-cnt" id="pcnt-${name}">...</span><span class="pill-del" title="삭제">✕</span>`;
+    pill.querySelector('.pill-del').onclick = e => { e.stopPropagation(); deleteMentee(name); };
+    pill.onclick = e => { if(e.target.classList.contains('pill-del'))return; selectMentee(name); };
+    bar.appendChild(pill);
+    get(ref(db,`logs/${name}`)).then(s => {
+      const el = document.getElementById(`pcnt-${name}`);
+      if(el) el.textContent = s.exists() ? Object.keys(s.val()).length : 0;
     });
   });
-  if(activeMentee&&menteeList.includes(activeMentee)){
-    document.getElementById('f-name').value=activeMentee;
-    loadCalendar();
-  }
+  if(activeMentee && !menteeList.includes(activeMentee)) activeMentee = null;
+  if(!activeMentee && menteeList.length) selectMentee(menteeList[0]);
 }
 
 function selectMentee(name){
-  activeMentee=name;
-  document.getElementById('f-name').value=name;
-  renderMenteeTabs();
-  resetForm();
-  loadCalendar();
+  activeMentee = name;
+  document.getElementById('f-name').value = name;
+  renderMenteeBar();
+  if(currentTab==='calendar') loadCalendar();
+  if(currentTab==='stats') loadStats();
 }
-window.selectMentee=selectMentee;
 
-// 멘티 추가/삭제
-window.openAddModal=()=>{
+// ── Mentee CRUD ──
+window.openAddModal = () => {
   document.getElementById('modal-bg').classList.add('show');
   setTimeout(()=>document.getElementById('modal-input').focus(),50);
 };
-window.closeModal=()=>{
+window.closeModal = () => {
   document.getElementById('modal-bg').classList.remove('show');
-  document.getElementById('modal-input').value='';
+  document.getElementById('modal-input').value = '';
 };
-window.addMentee=async()=>{
-  const name=document.getElementById('modal-input').value.trim();
-  if(!name){toast('이름을 입력해주세요');return;}
-  if(menteeList.includes(name)){toast('이미 있는 멘티예요');return;}
-  await set(ref(db,`mentees/${name}`),{createdAt:new Date().toISOString()});
-  activeMentee=name;
+window.addMentee = async () => {
+  const name = document.getElementById('modal-input').value.trim();
+  if(!name){ toast('이름을 입력해주세요'); return; }
+  if(menteeList.includes(name)){ toast('이미 있는 멘티예요'); return; }
+  await set(ref(db,`mentees/${name}`), {createdAt: new Date().toISOString()});
+  activeMentee = name;
   closeModal();
   toast(`${name} 멘티가 추가됐어요!`);
 };
-window.deleteMentee=async(name)=>{
-  if(!confirm(`"${name}" 멘티와 모든 기록을 삭제할까요?`))return;
+window.deleteMentee = async name => {
+  if(!confirm(`"${name}" 멘티와 모든 기록을 삭제할까요?`)) return;
   await remove(ref(db,`mentees/${name}`));
   await remove(ref(db,`logs/${name}`));
-  if(activeMentee===name){activeMentee=menteeList.filter(m=>m!==name)[0]||null;}
-  if(activeMentee)document.getElementById('f-name').value=activeMentee;
-  loadCalendar();
+  if(activeMentee===name) activeMentee = menteeList.filter(m=>m!==name)[0]||null;
   toast(`${name} 멘티가 삭제됐어요`);
 };
 
-// 업무 토글
-window.toggleTask=(i)=>{
-  const body=document.getElementById(`body-${i}`);
-  const arrow=document.getElementById(`arrow-${i}`);
-  body.classList.toggle('open');
-  arrow.textContent=body.classList.contains('open')?'▲':'▼';
+// ── Tab switching ──
+window.switchMainTab = (tab, el) => {
+  currentTab = tab;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if(tab==='calendar') loadCalendar();
+  if(tab==='stats') loadStats();
 };
 
-// 체크
-window.toggleCheck=(el)=>{el.classList.toggle('checked');updateSummary();};
+// ── Task list builder ──
+function buildTaskList(){
+  const container = document.getElementById('task-list');
+  container.innerHTML = '';
+  TASKS.forEach((task, i) => {
+    const block = document.createElement('div');
+    block.className = 'task-block';
+    block.innerHTML = `
+      <div class="task-head" onclick="toggleTask(${i})">
+        <div class="task-head-l">
+          <div class="task-num">${NUMS[i]}</div>
+          <div class="task-label">${task.name}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="task-badge" id="tbadge-${i}">미평가</span>
+          <span class="task-arrow" id="tarrow-${i}">▼</span>
+        </div>
+      </div>
+      <div class="task-body" id="tbody-${i}">
+        <div class="check-list" id="tchecks-${i}">
+          ${task.checks.map(c=>`<div class="check-item" onclick="toggleCheck(this)"><div class="chk-box"></div><div class="chk-label">${c}</div></div>`).join('')}
+        </div>
+        <div class="perf-label">수행도 평가</div>
+        <div class="perf-row" id="tperf-${i}">
+          <span class="perf-btn" onclick="selectPerf(${i},5,this)">매우 우수 (5)</span>
+          <span class="perf-btn" onclick="selectPerf(${i},4,this)">우수 (4)</span>
+          <span class="perf-btn" onclick="selectPerf(${i},3,this)">보통 (3)</span>
+          <span class="perf-btn" onclick="selectPerf(${i},2,this)">미흡 (2)</span>
+          <span class="perf-btn" onclick="selectPerf(${i},1,this)">불이행 (1)</span>
+        </div>
+        <textarea id="tcomment-${i}" placeholder="해당 업무 특이사항 / 코멘트 (선택)" rows="2" style="font-size:.83rem;margin-top:4px"></textarea>
+      </div>`;
+    container.appendChild(block);
+  });
+}
 
-// 수행도
-window.selectPerf=(i,v,el)=>{
-  perfVals[i]=v;
-  document.querySelectorAll(`#perf-${i} .perf-btn`).forEach(b=>b.className='perf-btn');
-  el.classList.add(`sel-${v}`);
-  updateBadge(i,v);
+window.toggleTask = i => {
+  const body = document.getElementById(`tbody-${i}`);
+  const arrow = document.getElementById(`tarrow-${i}`);
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+};
+window.toggleCheck = el => { el.classList.toggle('chk'); updateSummary(); };
+window.selectPerf = (i, v, el) => {
+  perfVals[i] = v;
+  document.querySelectorAll(`#tperf-${i} .perf-btn`).forEach(b => { b.className='perf-btn'; });
+  el.classList.add(`p${v}`);
+  const badge = document.getElementById(`tbadge-${i}`);
+  const cls = v>=4?'hi':v===3?'mid':'lo';
+  badge.textContent = `${PERF_LABEL[v]} (${v})`;
+  badge.className = `task-badge ${cls}`;
   updateSummary();
 };
 
-function updateBadge(i,v){
-  const badge=document.getElementById(`badge-${i}`);
-  if(!v){badge.textContent='미평가';badge.className='task-score-badge';return;}
-  const labels={5:'매우 우수',4:'우수',3:'보통',2:'미흡',1:'불이행'};
-  const cls={5:'s-high',4:'s-high',3:'s-mid',2:'s-low',1:'s-low'};
-  badge.textContent=`${labels[v]} (${v}점)`;
-  badge.className=`task-score-badge ${cls[v]}`;
-}
-
 function updateSummary(){
-  const evaluated=perfVals.filter(v=>v>0);
-  const count=evaluated.length;
-  const avg=count?Math.round(evaluated.reduce((a,b)=>a+b,0)/count*10)/10:0;
-  let totalChecks=0,checkedCount=0;
-  for(let i=0;i<7;i++){
-    totalChecks+=TOTAL_CHECKS[i];
-    checkedCount+=document.querySelectorAll(`#checks-${i} .check-item.checked`).length;
-  }
-  const checkPct=totalChecks?Math.round(checkedCount/totalChecks*100):0;
-  const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':count?'D':'-';
-  document.getElementById('sum-count').textContent=count;
-  document.getElementById('sum-check').textContent=checkPct+'%';
-  document.getElementById('sum-perf').textContent=avg||'-';
-  document.getElementById('sum-grade').textContent=grade;
+  const ev = perfVals.filter(v=>v>0);
+  const avg = ev.length ? Math.round(ev.reduce((a,b)=>a+b,0)/ev.length*10)/10 : 0;
+  let total=0, done=0;
+  TASKS.forEach((_,i) => {
+    total += TASKS[i].checks.length;
+    done += document.querySelectorAll(`#tchecks-${i} .check-item.chk`).length;
+  });
+  const pct = total ? Math.round(done/total*100) : 0;
+  const grade = avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':ev.length?'D':'-';
+  document.getElementById('sum-count').textContent = ev.length;
+  document.getElementById('sum-check').textContent = pct+'%';
+  document.getElementById('sum-perf').textContent = avg||'-';
+  document.getElementById('sum-grade').textContent = grade;
 }
 
-// 일지 생성
-window.generateLog=()=>{
-  const name=activeMentee;
-  if(!name){toast('먼저 멘티를 선택해주세요');return;}
+// ── 일지 생성 ──
+window.generateLog = () => {
+  if(!activeMentee){ toast('멘티를 선택해주세요'); return; }
   const date=document.getElementById('f-date').value;
   const mentor=document.getElementById('f-mentor').value||'(미입력)';
   const dept=document.getElementById('f-dept').value;
@@ -696,92 +732,88 @@ window.generateLog=()=>{
   const d=new Date(date);
   const days=['일','월','화','수','목','금','토'];
   const dateStr=date?`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`:'날짜 미입력';
+  const ev=perfVals.filter(v=>v>0);
+  const avg=ev.length?Math.round(ev.reduce((a,b)=>a+b,0)/ev.length*10)/10:0;
+  let total=0,done=0;
+  TASKS.forEach((_,i)=>{total+=TASKS[i].checks.length;done+=document.querySelectorAll(`#tchecks-${i} .check-item.chk`).length;});
+  const pct=total?Math.round(done/total*100):0;
+  const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':ev.length?'D':'-';
 
-  let t='';
-  t+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  let t='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
   t+=`  📋 멘티 일일 업무 일지 · (주)오픈웍스\n`;
-  t+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+  t+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
   t+=`▸ 날짜  : ${dateStr}${dayN?' / '+dayN:''}\n`;
-  t+=`▸ 멘티  : ${name}\n▸ 멘토  : ${mentor}\n▸ 부서  : ${dept}\n\n`;
-
-  const evaluated=perfVals.filter(v=>v>0);
-  const avg=evaluated.length?Math.round(evaluated.reduce((a,b)=>a+b,0)/evaluated.length*10)/10:0;
-  let totalChecks=0,checkedCount=0;
-  for(let i=0;i<7;i++){totalChecks+=TOTAL_CHECKS[i];checkedCount+=document.querySelectorAll(`#checks-${i} .check-item.checked`).length;}
-  const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':evaluated.length?'D':'-';
+  t+=`▸ 멘티  : ${activeMentee}\n▸ 멘토  : ${mentor}\n▸ 부서  : ${dept}\n\n`;
   t+=`[ 종합 평가 ]\n`;
-  t+=`• 평가 업무 수 : ${evaluated.length} / 7개\n`;
-  t+=`• 체크 완료율 : ${totalChecks?Math.round(checkedCount/totalChecks*100):0}% (${checkedCount}/${totalChecks})\n`;
+  t+=`• 평가 업무 수 : ${ev.length} / 7개\n`;
+  t+=`• 체크 완료율 : ${pct}% (${done}/${total})\n`;
   t+=`• 수행도 평균 : ${avg||'-'} / 5점\n`;
   t+=`• 종합 등급   : ${grade}\n\n`;
-
   t+=`[ 업무별 상세 ]\n`;
-  for(let i=0;i<7;i++){
+  TASKS.forEach((task,i)=>{
     const pv=perfVals[i];
-    const checked=document.querySelectorAll(`#checks-${i} .check-item.checked`).length;
-    const total=TOTAL_CHECKS[i];
-    const perfLabel={5:'매우 우수',4:'우수',3:'보통',2:'미흡',1:'불이행',0:'미평가'};
-    t+=`\n${['①','②','③','④','⑤','⑥','⑦'][i]} ${TASK_NAMES[i]}\n`;
-    t+=`  체크 : ${checked}/${total}개 완료\n`;
-    t+=`  수행도 : ${pv?`${perfLabel[pv]} (${pv}점)`:'미평가'}\n`;
-    // 체크된 항목
-    const checks=[...document.querySelectorAll(`#checks-${i} .check-item.checked .check-label`)].map(el=>el.textContent);
-    if(checks.length)t+=`  ✓ ${checks.join('\n  ✓ ')}\n`;
-    const uncomp=[...document.querySelectorAll(`#checks-${i} .check-item:not(.checked) .check-label`)].map(el=>el.textContent);
-    if(uncomp.length)t+=`  ☐ ${uncomp.join('\n  ☐ ')}\n`;
-    const cmt=document.getElementById(`comment-${i}`).value;
-    if(cmt)t+=`  💬 ${cmt}\n`;
-  }
+    const chkd=[...document.querySelectorAll(`#tchecks-${i} .check-item.chk .chk-label`)].map(e=>e.textContent);
+    const unchk=[...document.querySelectorAll(`#tchecks-${i} .check-item:not(.chk) .chk-label`)].map(e=>e.textContent);
+    t+=`\n${NUMS[i]} ${task.name}\n`;
+    t+=`  수행도 : ${pv?`${PERF_LABEL[pv]} (${pv}점)`:'미평가'}\n`;
+    if(chkd.length) t+=`  ✓ ${chkd.join('\n  ✓ ')}\n`;
+    if(unchk.length) t+=`  ☐ ${unchk.join('\n  ☐ ')}\n`;
+    const cmt=document.getElementById(`tcomment-${i}`).value;
+    if(cmt) t+=`  💬 ${cmt}\n`;
+  });
+  if(comment) t+=`\n[ 멘토 종합 코멘트 ]\n${comment}\n`;
+  if(next) t+=`\n[ 내일 예정 / 인수인계 ]\n${next}\n`;
+  t+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
 
-  if(comment)t+=`\n[ 멘토 종합 코멘트 ]\n${comment}\n`;
-  if(next)t+=`\n[ 내일 예정 / 인수인계 ]\n${next}\n`;
-  t+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-
-  document.getElementById('preview').textContent=t;
+  document.getElementById('preview').textContent = t;
   document.getElementById('preview').classList.add('show');
   document.getElementById('action-row').classList.add('show');
   document.getElementById('preview').scrollIntoView({behavior:'smooth',block:'start'});
 };
 
-window.copyLog=()=>navigator.clipboard.writeText(document.getElementById('preview').textContent).then(()=>toast('클립보드에 복사됐어요!'));
-window.downloadTxt=()=>{
-  const txt=document.getElementById('preview').textContent;
-  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`멘티일지_${activeMentee||'멘티'}_${document.getElementById('f-date').value||'날짜'}.txt`;
+window.copyLog = () => navigator.clipboard.writeText(document.getElementById('preview').textContent).then(()=>toast('복사됐어요!'));
+window.downloadTxt = () => {
+  const blob = new Blob([document.getElementById('preview').textContent],{type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `멘티일지_${activeMentee||'멘티'}_${document.getElementById('f-date').value}.txt`;
   a.click();
 };
-window.saveLog=async()=>{
-  const name=activeMentee;
-  if(!name){toast('멘티를 선택해주세요');return;}
-  const txt=document.getElementById('preview').textContent;
-  if(!txt){toast('먼저 일지를 생성해주세요');return;}
-  const date=document.getElementById('f-date').value;
-  const key=Date.now().toString();
-  await set(ref(db,`logs/${name}/${key}`),{
-    date,
-    day:document.getElementById('f-day').value,
-    text:txt,
-    saved:new Date().toLocaleString('ko-KR'),
-    savedAt:Date.now()
+window.saveLog = async () => {
+  if(!activeMentee){ toast('멘티를 선택해주세요'); return; }
+  const txt = document.getElementById('preview').textContent;
+  if(!txt){ toast('먼저 일지를 생성해주세요'); return; }
+  const ev=perfVals.filter(v=>v>0);
+  const avg=ev.length?Math.round(ev.reduce((a,b)=>a+b,0)/ev.length*10)/10:0;
+  let total=0,done=0;
+  TASKS.forEach((_,i)=>{total+=TASKS[i].checks.length;done+=document.querySelectorAll(`#tchecks-${i} .check-item.chk`).length;});
+  const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':ev.length?'D':'-';
+  const key = Date.now().toString();
+  await set(ref(db,`logs/${activeMentee}/${key}`), {
+    date: document.getElementById('f-date').value,
+    day: document.getElementById('f-day').value,
+    text: txt,
+    saved: new Date().toLocaleString('ko-KR'),
+    savedAt: Date.now(),
+    avg, grade,
+    checkPct: total?Math.round(done/total*100):0,
+    evalCount: ev.length,
+    perfVals: [...perfVals],
   });
-  renderMenteeTabs();
-  loadCalendar();
+  renderMenteeBar();
   toast('저장됐어요!');
 };
-
-window.resetForm=()=>{
-  for(let i=0;i<7;i++){
+window.resetForm = () => {
+  TASKS.forEach((_,i) => {
     perfVals[i]=0;
-    document.querySelectorAll(`#checks-${i} .check-item`).forEach(el=>el.classList.remove('checked'));
-    document.querySelectorAll(`#perf-${i} .perf-btn`).forEach(b=>b.className='perf-btn');
-    document.getElementById(`comment-${i}`).value='';
-    document.getElementById(`badge-${i}`).textContent='미평가';
-    document.getElementById(`badge-${i}`).className='task-score-badge';
-    document.getElementById(`body-${i}`).classList.remove('open');
-    document.getElementById(`arrow-${i}`).textContent='▼';
-  }
+    document.querySelectorAll(`#tchecks-${i} .check-item`).forEach(e=>e.classList.remove('chk'));
+    document.querySelectorAll(`#tperf-${i} .perf-btn`).forEach(b=>{b.className='perf-btn';});
+    document.getElementById(`tcomment-${i}`).value='';
+    document.getElementById(`tbadge-${i}`).textContent='미평가';
+    document.getElementById(`tbadge-${i}`).className='task-badge';
+    document.getElementById(`tbody-${i}`).classList.remove('open');
+    document.getElementById(`tarrow-${i}`).classList.remove('open');
+  });
   document.getElementById('f-comment').value='';
   document.getElementById('f-next').value='';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
@@ -791,94 +823,189 @@ window.resetForm=()=>{
   updateSummary();
 };
 
-// ── 캘린더 ──
+// ── Calendar ──
 async function loadCalendar(){
-  const name=activeMentee;
-  const wrap=document.getElementById('cal-wrap');
-  if(!name){wrap.style.display='none';return;}
-  wrap.style.display='block';
-  const snap=await get(ref(db,`logs/${name}`));
-  calLogDates={};
+  if(!activeMentee) return;
+  const snap = await get(ref(db,`logs/${activeMentee}`));
+  calLogs = {};
   if(snap.exists()){
     Object.entries(snap.val()).forEach(([k,v])=>{
       if(v.date){
-        if(!calLogDates[v.date])calLogDates[v.date]=[];
-        calLogDates[v.date].push({key:k,...v});
+        if(!calLogs[v.date]) calLogs[v.date]=[];
+        calLogs[v.date].push({key:k,...v});
       }
     });
   }
   renderCalendar();
 }
-
 function renderCalendar(){
   const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-  document.getElementById('cal-title').textContent=`${calYear}년 ${months[calMonth]}`;
+  document.getElementById('cal-title').textContent=`${calYear}년 ${months[calMonth]} · ${activeMentee||'멘티 선택'}`;
   const grid=document.getElementById('cal-grid');
   grid.innerHTML='';
   ['일','월','화','수','목','금','토'].forEach(d=>{
-    const el=document.createElement('div');
-    el.className='cal-day-label';
-    el.textContent=d;
-    grid.appendChild(el);
+    const el=document.createElement('div');el.className='cal-dlabel';el.textContent=d;grid.appendChild(el);
   });
   const first=new Date(calYear,calMonth,1).getDay();
-  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
   const today=new Date().toISOString().split('T')[0];
-  for(let i=0;i<first;i++){
-    const el=document.createElement('div');el.className='cal-cell empty';grid.appendChild(el);
-  }
-  for(let d=1;d<=daysInMonth;d++){
-    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-cell empty';grid.appendChild(e);}
+  for(let d=1;d<=dim;d++){
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const el=document.createElement('div');
-    el.className='cal-cell';
-    el.textContent=d;
-    if(dateStr===today)el.classList.add('today');
-    if(calLogDates[dateStr]){
+    el.className='cal-cell';el.textContent=d;
+    if(ds===today) el.classList.add('today');
+    if(calLogs[ds]){
       el.classList.add('has-log');
-      const dot=document.createElement('div');dot.className='cal-dot';el.appendChild(dot);
-      el.onclick=()=>openLogModal(dateStr,calLogDates[dateStr]);
+      const dot=document.createElement('div');dot.className='cdot';el.appendChild(dot);
+      el.onclick=()=>showCalDetail(ds);
     }
     grid.appendChild(el);
   }
 }
-
+function showCalDetail(date){
+  const d=new Date(date);
+  const days=['일','월','화','수','목','금','토'];
+  document.getElementById('cal-detail-title').textContent=`${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) · ${activeMentee}`;
+  const body=document.getElementById('cal-detail-body');
+  body.innerHTML='';
+  const logs=calLogs[date]||[];
+  logs.forEach(l=>{
+    const wrap=document.createElement('div');
+    wrap.className='log-entry-item';
+    wrap.innerHTML=`
+      <div class="log-entry-meta">
+        <span class="log-entry-name">${activeMentee} ${l.grade?`· ${l.grade}등급`:''} ${l.avg?`· 평균 ${l.avg}점`:''}</span>
+        <span style="display:flex;align-items:center">
+          <span class="log-entry-time">${l.saved||''}</span>
+          <span class="log-del-btn" onclick="deleteLog('${l.key}','${date}')">삭제</span>
+        </span>
+      </div>
+      <div class="log-entry-txt">${l.text||''}</div>`;
+    body.appendChild(wrap);
+  });
+}
+window.deleteLog = async (key,date) => {
+  if(!confirm('이 기록을 삭제할까요?')) return;
+  await remove(ref(db,`logs/${activeMentee}/${key}`));
+  toast('삭제됐어요');
+  loadCalendar();
+  renderMenteeBar();
+  document.getElementById('cal-detail-body').innerHTML='<div class="cal-detail-empty">삭제됐어요</div>';
+};
 window.changeMonth=(dir)=>{
   calMonth+=dir;
   if(calMonth<0){calMonth=11;calYear--;}
   if(calMonth>11){calMonth=0;calYear++;}
   renderCalendar();
+  document.getElementById('cal-detail-title').textContent='날짜를 선택하세요';
+  document.getElementById('cal-detail-body').innerHTML='<div class="cal-detail-empty">📅<br>날짜를 클릭하면<br>해당 일의 기록이 표시됩니다</div>';
 };
 
-async function openLogModal(date,logs){
-  const d=new Date(date);
-  const days=['일','월','화','수','목','금','토'];
-  document.getElementById('log-modal-title').textContent=`📅 ${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]}) 기록`;
-  const body=document.getElementById('log-modal-body');
-  body.innerHTML='';
-  logs.forEach(l=>{
-    const wrap=document.createElement('div');
-    wrap.innerHTML=`
-      <div class="log-entry-header">
-        <div class="log-entry-date">저장: ${l.saved||''}</div>
-        <span class="log-del-btn" onclick="deleteLogFromModal('${activeMentee}','${l.key}','${date}')">삭제</span>
-      </div>
-      <div class="log-entry">${l.text||''}</div>`;
-    body.appendChild(wrap);
+// ── Stats ──
+window.switchPeriod=(p,el)=>{
+  statsPeriod=p;
+  document.querySelectorAll('.period-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  loadStats();
+};
+
+async function loadStats(){
+  if(!menteeList.length){
+    document.getElementById('stats-content').innerHTML='<div class="no-data">멘티를 추가하면 통계가 표시됩니다</div>';
+    return;
+  }
+  document.getElementById('stats-content').innerHTML='<div class="no-data">통계 불러오는 중...</div>';
+
+  const now=new Date();
+  let fromDate;
+  if(statsPeriod==='week'){
+    const d=new Date(now);d.setDate(d.getDate()-6);
+    fromDate=d.toISOString().split('T')[0];
+  } else if(statsPeriod==='month'){
+    fromDate=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  } else fromDate='2000-01-01';
+
+  // 모든 멘티 데이터 로드
+  const allData={};
+  await Promise.all(menteeList.map(async name=>{
+    const snap=await get(ref(db,`logs/${name}`));
+    if(!snap.exists()){allData[name]=[];return;}
+    allData[name]=Object.entries(snap.val())
+      .map(([k,v])=>({key:k,...v}))
+      .filter(l=>l.date>=fromDate)
+      .sort((a,b)=>b.savedAt-a.savedAt);
+  }));
+
+  // 전체 통계
+  let totalLogs=0,totalAvg=0,avgCount=0,totalCheckPct=0,pctCount=0;
+  Object.values(allData).forEach(logs=>{
+    totalLogs+=logs.length;
+    logs.forEach(l=>{
+      if(l.avg){totalAvg+=l.avg;avgCount++;}
+      if(l.checkPct!=null){totalCheckPct+=l.checkPct;pctCount++;}
+    });
   });
-  document.getElementById('log-modal-bg').classList.add('show');
+  const overallAvg=avgCount?Math.round(totalAvg/avgCount*10)/10:0;
+  const overallPct=pctCount?Math.round(totalCheckPct/pctCount):0;
+
+  const periodLabel={week:'이번 주',month:'이번 달',all:'전체'}[statsPeriod];
+
+  let html=`
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-card-label">총 기록 수 (${periodLabel})</div><div class="stat-card-val">${totalLogs}</div><div class="stat-card-sub">건</div></div>
+    <div class="stat-card"><div class="stat-card-label">수행도 전체 평균</div><div class="stat-card-val">${overallAvg||'-'}</div><div class="stat-card-sub">/ 5점</div></div>
+    <div class="stat-card"><div class="stat-card-label">체크 완료율 평균</div><div class="stat-card-val">${overallPct||'-'}${overallPct?'%':''}</div><div class="stat-card-sub">전체 항목 대비</div></div>
+    <div class="stat-card"><div class="stat-card-label">평가 대상 멘티</div><div class="stat-card-val">${menteeList.length}</div><div class="stat-card-sub">명</div></div>
+  </div>
+  <div class="mentee-stats-grid">`;
+
+  menteeList.forEach(name=>{
+    const logs=allData[name];
+    if(!logs.length){
+      html+=`<div class="mentee-stat-card"><div class="msc-header"><div class="msc-name">${name}</div><div class="msc-grade">-</div></div><div style="color:var(--text3);font-size:.82rem;text-align:center;padding:20px 0">${periodLabel} 기록이 없어요</div></div>`;
+      return;
+    }
+    const avgs=logs.filter(l=>l.avg).map(l=>l.avg);
+    const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length*10)/10:0;
+    const pcts=logs.filter(l=>l.checkPct!=null).map(l=>l.checkPct);
+    const pct=pcts.length?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):0;
+    const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':avgs.length?'D':'-';
+
+    // 업무별 평균
+    const taskAvgs=Array(7).fill(null).map(()=>({sum:0,cnt:0}));
+    logs.forEach(l=>{
+      if(l.perfVals) l.perfVals.forEach((v,i)=>{if(v>0){taskAvgs[i].sum+=v;taskAvgs[i].cnt++;}});
+    });
+
+    html+=`<div class="mentee-stat-card">
+      <div class="msc-header"><div class="msc-name">${name}</div><div class="msc-grade">${grade}</div></div>
+      <div class="msc-body">
+        <div class="msc-item"><div class="msc-item-label">기록 수</div><div class="msc-item-val">${logs.length}</div></div>
+        <div class="msc-item"><div class="msc-item-label">수행도 평균</div><div class="msc-item-val">${avg||'-'}</div></div>
+        <div class="msc-item"><div class="msc-item-label">체크 완료율</div><div class="msc-item-val">${pct}%</div></div>
+      </div>
+      <div style="font-size:.72rem;color:var(--text3);margin-bottom:8px;letter-spacing:.5px">업무 영역별 수행도</div>
+      <div class="task-bars">
+        ${TASKS.map((task,i)=>{
+          const ta=taskAvgs[i];
+          const v=ta.cnt?Math.round(ta.sum/ta.cnt*10)/10:0;
+          const pct=v?Math.round(v/5*100):0;
+          return `<div class="task-bar-row">
+            <div class="task-bar-label">${task.name.length>8?task.name.slice(0,7)+'…':task.name}</div>
+            <div class="task-bar-track"><div class="task-bar-fill" style="width:${pct}%"></div></div>
+            <div class="task-bar-val">${v||'-'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  html+='</div>';
+  document.getElementById('stats-content').innerHTML=html;
 }
 
-window.deleteLogFromModal=async(name,key,date)=>{
-  if(!confirm('이 기록을 삭제할까요?'))return;
-  await remove(ref(db,`logs/${name}/${key}`));
-  closeLogModal();
-  loadCalendar();
-  renderMenteeTabs();
-  toast('삭제됐어요');
-};
-window.closeLogModal=()=>document.getElementById('log-modal-bg').classList.remove('show');
-document.getElementById('log-modal-bg').onclick=function(e){if(e.target===this)closeLogModal();};
-document.getElementById('modal-bg').onclick=function(e){if(e.target===this)closeModal();};
+document.getElementById('modal-bg').onclick=e=>{if(e.target===document.getElementById('modal-bg'))closeModal();};
 
 function toast(msg){
   const t=document.getElementById('toast');
