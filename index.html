@@ -652,10 +652,14 @@ window.gotoTab=(tab,el)=>{
   document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
   if(el) el.classList.add('active');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-'+tab).classList.add('active');
+  const panelEl=document.getElementById('panel-'+tab);
+  if(panelEl) panelEl.classList.add('active');
   if(tab==='calendar') loadCalendar();
   if(tab==='stats') loadStats();
   if(tab==='dashboard') loadDashboard();
+  if(tab==='growth'){renderGrowthMenteeFilter();loadGrowth();}
+  if(tab==='eval'){renderEvalMenteeFilter();loadEval();}
+  if(tab==='stage'){loadStage();}
 };
 
 // ── Sidebar ──
@@ -774,7 +778,7 @@ async function loadDashboard(){
         <div class="mc-last">최근: ${lastLog?lastLog.date||'-':'-'}</div>
         <div class="mc-logs" style="color:${color}">${logs.length}개 기록 →</div>
       </div>`;
-    card.onclick=()=>{activeMentee=name;document.getElementById('f-name').value=name;renderSidebar();renderWriteMenteeBtns();gotoTab('calendar',null);document.querySelector('.nav-item:nth-child(3)').classList.add('active');document.querySelector('.nav-item:nth-child(1)').classList.remove('active');calMenteeFilter=name;loadCalendar();};
+    card.onclick=()=>{activeMentee=name;document.getElementById('f-name').value=name;renderSidebar();renderWriteMenteeBtns();calMenteeFilter=name;gotoTab('calendar',document.querySelector(".nav-item[onclick=\\"gotoTab('calendar',this)\\"]"));};
     cardsEl.appendChild(card);
   });
 
@@ -1607,14 +1611,7 @@ window.saveStageNote=async(name)=>{
   toast('메모가 저장됐어요!');
 };
 
-// ── gotoTab 확장 ──
-const _origGotoTab = window.gotoTab;
-window.gotoTab=(tab,el)=>{
-  _origGotoTab(tab,el);
-  if(tab==='growth'){renderGrowthMenteeFilter();loadGrowth();}
-  if(tab==='eval'){renderEvalMenteeFilter();loadEval();}
-  if(tab==='stage'){loadStage();}
-};
+// gotoTab 확장은 기존 함수에 통합됨
 
 </script>
 </body>
