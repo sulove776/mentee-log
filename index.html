@@ -412,13 +412,13 @@ input[readonly]{background:var(--bg);cursor:not-allowed;color:var(--text2)}
 <!-- Sidebar -->
 <div class="sidebar">
   <div class="nav-section">메뉴</div>
-  <div class="nav-item active" onclick="gotoTab('dashboard',this)"><span class="ni">🏠</span>대시보드</div>
-  <div class="nav-item" onclick="gotoTab('write',this)"><span class="ni">✏️</span>업무 작성</div>
-  <div class="nav-item" onclick="gotoTab('calendar',this)"><span class="ni">📅</span>캘린더</div>
-  <div class="nav-item" onclick="gotoTab('stats',this)"><span class="ni">📊</span>통계 &amp; 보고서</div>
-  <div class="nav-item" onclick="gotoTab('growth',this)"><span class="ni">📈</span>성장 추이</div>
-  <div class="nav-item" onclick="gotoTab('eval',this)"><span class="ni">🏆</span>전환 평가표</div>
-  <div class="nav-item" onclick="gotoTab('stage',this)"><span class="ni">🪜</span>단계 트래커</div>
+  <div class="nav-item active" data-tab="dashboard"><span class="ni">🏠</span>대시보드</div>
+  <div class="nav-item" data-tab="write"><span class="ni">✏️</span>업무 작성</div>
+  <div class="nav-item" data-tab="calendar"><span class="ni">📅</span>캘린더</div>
+  <div class="nav-item" data-tab="stats"><span class="ni">📊</span>통계 &amp; 보고서</div>
+  <div class="nav-item" data-tab="growth"><span class="ni">📈</span>성장 추이</div>
+  <div class="nav-item" data-tab="eval"><span class="ni">🏆</span>전환 평가표</div>
+  <div class="nav-item" data-tab="stage"><span class="ni">🪜</span>단계 트래커</div>
   <div class="nav-divider"></div>
   <div class="nav-mentee-section">
     <div class="nav-mentee-title">멘티</div>
@@ -606,6 +606,8 @@ input[readonly]{background:var(--bg);cursor:not-allowed;color:var(--text2)}
 </div>
 <div class="toast" id="toast"></div>
 
+
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -647,20 +649,26 @@ onValue(ref(db,'mentees'),snap=>{
 },()=>{document.getElementById('sdot').className='sdot';document.getElementById('stxt').textContent='오프라인';});
 
 // ── Nav ──
-window.gotoTab=(tab,el)=>{
-  currentTab=tab;
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-  if(el) el.classList.add('active');
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const panelEl=document.getElementById('panel-'+tab);
-  if(panelEl) panelEl.classList.add('active');
-  if(tab==='calendar') loadCalendar();
-  if(tab==='stats') loadStats();
-  if(tab==='dashboard') loadDashboard();
-  if(tab==='growth'){renderGrowthMenteeFilter();loadGrowth();}
-  if(tab==='eval'){renderEvalMenteeFilter();loadEval();}
-  if(tab==='stage'){loadStage();}
-};
+
+// ── 네비게이션 클릭 바인딩 ──
+document.querySelectorAll('[data-tab]').forEach(el => {
+  el.addEventListener('click', () => {
+    const tab = el.dataset.tab;
+    currentTab = tab;
+    document.querySelectorAll('[data-tab]').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    const panelEl = document.getElementById('panel-' + tab);
+    if(panelEl) panelEl.classList.add('active');
+    if(tab==='calendar') loadCalendar();
+    else if(tab==='stats') loadStats();
+    else if(tab==='dashboard') loadDashboard();
+    else if(tab==='growth'){renderGrowthMenteeFilter();loadGrowth();}
+    else if(tab==='eval'){renderEvalMenteeFilter();loadEval();}
+    else if(tab==='stage'){loadStage();}
+  });
+});
+
 
 // ── Sidebar ──
 function renderSidebar(){
@@ -1209,7 +1217,49 @@ window.exportExcel=async()=>{
   toast('엑셀 다운로드 완료!');
 };
 
-document.getElementById('modal-bg').onclick=e=>{if(e.target===document.getElementById('modal-bg'))closeModal()};
+
+
+// ── 버튼 이벤트 바인딩 (onclick 대체) ──
+function bindButtons() {
+  const bind = (sel, fn) => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.addEventListener('click', fn);
+    });
+  };
+  const bindOne = (sel, fn) => {
+    const el = document.querySelector(sel);
+    if(el) el.addEventListener('click', fn);
+  };
+
+  // 네비게이션은 이미 data-tab으로 처리됨
+
+  // 멘티 추가 모달
+  bindOne('[onclick="openAddModal()"]', openAddModal);
+  bindOne('[onclick="closeModal()"]', closeModal);
+  bindOne('[onclick="addMentee()"]', addMentee);
+
+  // 폼 버튼
+  bindOne('[onclick="resetForm()"]', resetForm);
+  bindOne('[onclick="generateLog()"]', generateLog);
+  bindOne('[onclick="copyLog()"]', copyLog);
+  bindOne('[onclick="saveLog()"]', saveLog);
+  bindOne('[onclick="downloadTxt()"]', downloadTxt);
+
+  // 캘린더
+  bindOne('[onclick="changeMonth(-1)"]', () => changeMonth(-1));
+  bindOne('[onclick="changeMonth(1)"]', () => changeMonth(1));
+
+  // 통계
+  document.querySelectorAll('.ptab').forEach(el => {
+    el.addEventListener('click', () => switchPeriod(el.textContent.trim() === '주간' ? 'week' : el.textContent.trim() === '월간' ? 'month' : 'all', el));
+  });
+  bindOne('[onclick="generateReport()"]', generateReport);
+  bindOne('[onclick="exportExcel()"]', exportExcel);
+  bindOne('[onclick="copyReport()"]', () => copyReport());
+}
+
+document.getElementById('modal-bg').onclick=e=>{if(e.target===document.getElementById('modal-bg'))closeModal()}
+bindButtons();;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
 // ══════════════════════════════════════════════
