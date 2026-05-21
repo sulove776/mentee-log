@@ -786,7 +786,21 @@ async function loadDashboard(){
         <div class="mc-last">최근: ${lastLog?lastLog.date||'-':'-'}</div>
         <div class="mc-logs" style="color:${color}">${logs.length}개 기록 →</div>
       </div>`;
-    card.onclick=()=>{activeMentee=name;document.getElementById('f-name').value=name;renderSidebar();renderWriteMenteeBtns();calMenteeFilter=name;gotoTab('calendar',document.querySelector(".nav-item[onclick=\\"gotoTab('calendar',this)\\"]"));};
+    card.onclick=()=>{
+    activeMentee=name;
+    document.getElementById('f-name').value=name;
+    renderSidebar();
+    renderWriteMenteeBtns();
+    calMenteeFilter=name;
+    const calEl=document.querySelector('[data-tab="calendar"]');
+    currentTab='calendar';
+    document.querySelectorAll('[data-tab]').forEach(i=>i.classList.remove('active'));
+    if(calEl) calEl.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    const panelEl=document.getElementById('panel-calendar');
+    if(panelEl) panelEl.classList.add('active');
+    loadCalendar();
+  };
     cardsEl.appendChild(card);
   });
 
@@ -834,7 +848,7 @@ function buildTaskList(){
   TASKS.forEach((task,i)=>{
     const b=document.createElement('div');b.className='task-block';
     b.innerHTML=`
-      <div class="task-head" onclick="toggleTask(${i})">
+      <div class="task-head" data-action="toggleTask" data-i="${i}">
         <div class="th-l"><div class="t-num">${NUMS[i]}</div><div class="t-name">${task.name}</div></div>
         <div style="display:flex;align-items:center;gap:7px">
           <span class="t-badge" id="tb-${i}">미평가</span>
@@ -843,15 +857,15 @@ function buildTaskList(){
       </div>
       <div class="task-body" id="tbd-${i}">
         <div class="chk-list" id="tch-${i}">
-          ${task.checks.map(c=>`<div class="chk-item" onclick="toggleCheck(this)"><div class="cbox"></div><div class="clabel">${c}</div></div>`).join('')}
+          ${task.checks.map(c=>`<div class="chk-item" data-action="toggleCheck"><div class="cbox"></div><div class="clabel">${c}</div></div>`).join('')}
         </div>
         <div style="font-size:.7rem;font-weight:600;color:var(--text3);letter-spacing:.5px;margin-bottom:6px">수행도 평가</div>
         <div class="perf-row" id="tp-${i}">
-          <span class="perf-btn" onclick="selectPerf(${i},5,this)">매우 우수 (5)</span>
-          <span class="perf-btn" onclick="selectPerf(${i},4,this)">우수 (4)</span>
-          <span class="perf-btn" onclick="selectPerf(${i},3,this)">보통 (3)</span>
-          <span class="perf-btn" onclick="selectPerf(${i},2,this)">미흡 (2)</span>
-          <span class="perf-btn" onclick="selectPerf(${i},1,this)">불이행 (1)</span>
+          <span class="perf-btn" data-action="selectPerf" data-ti="${i}" data-v="5">매우 우수 (5)</span>
+          <span class="perf-btn" data-action="selectPerf" data-ti="${i}" data-v="4">우수 (4)</span>
+          <span class="perf-btn" data-action="selectPerf" data-ti="${i}" data-v="3">보통 (3)</span>
+          <span class="perf-btn" data-action="selectPerf" data-ti="${i}" data-v="2">미흡 (2)</span>
+          <span class="perf-btn" data-action="selectPerf" data-ti="${i}" data-v="1">불이행 (1)</span>
         </div>
         <textarea id="tc-${i}" placeholder="특이사항 / 코멘트 (선택)" rows="2" style="font-size:.82rem;margin-top:3px"></textarea>
       </div>`;
@@ -1013,7 +1027,7 @@ function showCalDetail(date){
         </div>
         <div style="display:flex;align-items:center">
           <span class="log-card-time">${l.saved||''}</span>
-          <span class="ldel" onclick="deleteCalLog('${l.name}','${l.key}','${date}')">삭제</span>
+          <span class="ldel" style="cursor:pointer" data-name="${l.name}" data-key="${l.key}" data-date="${date}">삭제</span>
         </div>
       </div>
       <div class="log-card-txt">${l.text||''}</div>`;
@@ -1167,11 +1181,12 @@ window.generateReport=async()=>{
       <span>📋 ${periodLabel} 보고서 자동 생성</span>
       <div style="display:flex;gap:8px">
         <button class="btn btn-ghost" onclick="copyReport()">📋 복사</button>
-        <button class="btn btn-primary" onclick="downloadReport('${periodLabel}')">⬇ 다운로드</button>      </div>
+        <button class="btn btn-primary" id="btn-download-report">⬇ 다운로드</button>      </div>
     </div>
     <div class="report-content" id="report-text">${report}</div>
   </div>`;
   sec.scrollIntoView({behavior:'smooth'});
+  if(window._rebindReportBtns) window._rebindReportBtns();
 };
 window.copyReport=()=>navigator.clipboard.writeText(document.getElementById('report-text').textContent).then(()=>toast('보고서가 복사됐어요!'));
 window.downloadReport=(label)=>{
@@ -1258,8 +1273,52 @@ function bindButtons() {
   bindOne('[onclick="copyReport()"]', () => copyReport());
 }
 
+
+// 동적 생성 요소 이벤트 위임
+document.addEventListener('click', e => {
+  // ldel (캘린더 삭제)
+  const ldel = e.target.closest('.ldel[data-key]');
+  if(ldel) {
+    deleteCalLog(ldel.dataset.name, ldel.dataset.key, ldel.dataset.date);
+    return;
+  }
+  // data-action 기반 위임
+  const act = e.target.closest('[data-action]');
+  if(!act) return;
+  const action = act.dataset.action;
+  if(action === 'toggleTask') {
+    const body = document.getElementById('tbd-'+act.dataset.i);
+    const arrow = document.getElementById('ta-'+act.dataset.i);
+    if(body) body.classList.toggle('open');
+    if(arrow) arrow.classList.toggle('open');
+  } else if(action === 'selectPerf') {
+    selectPerf(parseInt(act.dataset.ti), parseInt(act.dataset.v), act);
+  } else if(action === 'copyEval') {
+    copyEvalReport(act.dataset.name);
+  } else if(action === 'saveEval') {
+    saveEvalComment(act.dataset.name);
+  } else if(action === 'dlEval') {
+    downloadEvalReport(act.dataset.name);
+  } else if(action === 'setStage') {
+    setStage(act.dataset.name, parseInt(act.dataset.i));
+  } else if(action === 'saveStage') {
+    saveStageNote(act.dataset.name);
+  } else if(action === 'toggleCheck') {
+    act.classList.toggle('chk');
+    updateSummary();
+  }
+});
+
 document.getElementById('modal-bg').onclick=e=>{if(e.target===document.getElementById('modal-bg'))closeModal()}
-bindButtons();;
+bindButtons();
+// 동적 생성 버튼들 재바인딩 (stats 로드 후)
+window._rebindReportBtns = () => {
+  const dlBtn = document.getElementById('btn-download-report');
+  if(dlBtn && !dlBtn._bound) {
+    dlBtn.addEventListener('click', () => downloadReport(statsPeriod==='week'?'주간':statsPeriod==='month'?'월간':'전체'));
+    dlBtn._bound = true;
+  }
+};;
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 
 // ══════════════════════════════════════════════
@@ -1481,9 +1540,9 @@ async function loadEval(){
       <div class="eval-comment-lbl">멘토 최종 의견 <span style="color:var(--text3);font-weight:400">(상무님 보고용)</span></div>
       <textarea class="eval-comment-input" id="eval-comment-${name}" placeholder="이 직원에 대한 종합 평가 의견을 입력해주세요...">${commentVal}</textarea>
       <div class="eval-actions">
-        <button class="btn btn-ghost" onclick="copyEvalReport('${name}')">📋 평가서 복사</button>
-        <button class="btn btn-ghost" onclick="saveEvalComment('${name}')">💾 의견 저장</button>
-        <button class="btn btn-primary" onclick="downloadEvalReport('${name}')">⬇ PDF용 다운로드</button>
+        <button class="btn btn-ghost" data-action="copyEval" data-name="${name}">📋 평가서 복사</button>
+        <button class="btn btn-ghost" data-action="saveEval" data-name="${name}">💾 의견 저장</button>
+        <button class="btn btn-primary" data-action="dlEval" data-name="${name}">⬇ PDF용 다운로드</button>
       </div>
     </div>
   </div>`;
@@ -1604,7 +1663,7 @@ async function loadStage(){
       const labelClass=done?'done':current?'current':'';
       const connClass=i<STAGE_DEFS.length-1?(i<cur?'done':''):'';
       return `<div class="stage-step">
-        <div class="stage-step-inner" onclick="setStage('${name}',${i})">
+        <div class="stage-step-inner" data-action="setStage" data-name="${name}" data-i="${i}">
           <div class="stage-circle ${circleClass}">${done?'✓':i+1}</div>
           <div class="stage-label ${labelClass}">${s.label}</div>
         </div>
@@ -1635,7 +1694,7 @@ async function loadStage(){
       <div style="font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.3px">단계 메모 / 특이사항</div>
       <textarea class="stage-note-area" id="stage-note-${name}" placeholder="단계별 특이사항이나 메모를 입력하세요...">${notes}</textarea>
       <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
-        <button class="btn btn-ghost" onclick="saveStageNote('${name}')">💾 메모 저장</button>
+        <button class="btn btn-ghost" data-action="saveStage" data-name="${name}">💾 메모 저장</button>
       </div>`;
     cont.appendChild(card);
   }));
