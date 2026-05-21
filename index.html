@@ -1112,41 +1112,38 @@ async function loadStats(){
 window.generateReport=async()=>{
   if(!menteeList.length){toast('멘티 데이터가 없습니다');return;}
   const now=new Date();
-  const isWeek=statsPeriod==='week'||statsPeriod==='all';
   let fromDate;
   if(statsPeriod==='week'){const d=new Date(now);d.setDate(d.getDate()-6);fromDate=d.toISOString().split('T')[0];}
-  else if(statsPeriod==='month')fromDate=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  else if(statsPeriod==='month')fromDate=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
   else fromDate='2000-01-01';
-
   const allData={};
   await Promise.all(menteeList.map(async name=>{
-    const s=await get(ref(db,`logs/${name}`));
+    const s=await get(ref(db,'logs/'+name));
     allData[name]=s.exists()?Object.values(s.val()).filter(l=>l.date>=fromDate).sort((a,b)=>b.savedAt-a.savedAt):[];
   }));
-
-  const d=now;const periodLabel={week:'주간',month:'월간',all:'전체'}[statsPeriod];
-  const weekStr=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${statsPeriod==='week'?`${d.getDate()-6}일~${d.getDate()}일`:statsPeriod==='month'?'':''}`;
-  let report=`╔══════════════════════════════════════════╗\n`;
-  report+=`║     ${periodLabel} 멘티 업무 수행 보고서     ║\n`;
-  report+=`╚══════════════════════════════════════════╝\n\n`;
-  report+=`▸ 보고일    : ${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일\n`;
-  report+=`▸ 보고 기간 : ${periodLabel} (${fromDate} ~ ${now.toISOString().split('T')[0]})\n`;
-  report+=`▸ 보고자    : 스마트기술팀 멘토\n`;
-  report+=`▸ 대상 멘티 : ${menteeList.join(', ')}\n\n`;
-  report+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-  report+=`1. 종합 현황\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
+  const d=now;
+  const periodLabel={week:'주간',month:'월간',all:'전체'}[statsPeriod];
+  let report='';
+  report+='╔══════════════════════════════════════════╗\n';
+  report+='║     '+periodLabel+' 멘티 업무 수행 보고서     ║\n';
+  report+='╚══════════════════════════════════════════╝\n\n';
+  report+='▸ 보고일    : '+d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일\n';
+  report+='▸ 보고 기간 : '+periodLabel+' ('+fromDate+' ~ '+now.toISOString().split('T')[0]+')\n';
+  report+='▸ 보고자    : 스마트기술팀 멘토\n';
+  report+='▸ 대상 멘티 : '+menteeList.join(', ')+'\n\n';
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  report+='1. 종합 현황\n';
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
   let totalLogs=0,allAvgs=[];
   menteeList.forEach(name=>{totalLogs+=allData[name].length;allData[name].forEach(l=>{if(l.avg)allAvgs.push(l.avg)})});
   const oa=allAvgs.length?Math.round(allAvgs.reduce((a,b)=>a+b,0)/allAvgs.length*10)/10:0;
-  report+=`• 총 기록 건수  : ${totalLogs}건\n`;
-  report+=`• 수행도 전체 평균 : ${oa||'-'} / 5점\n`;
-  report+=`• 평가 대상 멘티   : ${menteeList.length}명\n\n`;
-
-  report+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-  report+=`2. 멘티별 상세 현황\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
-  menteeList.forEach((name,i)=>{
+  report+='• 총 기록 건수     : '+totalLogs+'건\n';
+  report+='• 수행도 전체 평균 : '+(oa||'-')+' / 5점\n';
+  report+='• 평가 대상 멘티   : '+menteeList.length+'명\n\n';
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  report+='2. 멘티별 상세 현황\n';
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  menteeList.forEach((name)=>{
     const logs=allData[name];
     const avgs=logs.filter(l=>l.avg).map(l=>l.avg);
     const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length*10)/10:0;
@@ -1155,39 +1152,44 @@ window.generateReport=async()=>{
     const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':avgs.length?'D':'-';
     const taskAvgs=Array(7).fill(null).map(()=>({s:0,c:0}));
     logs.forEach(l=>{if(l.perfVals)l.perfVals.forEach((v,j)=>{if(v>0){taskAvgs[j].s+=v;taskAvgs[j].c++}})});
-    report+=`【 ${name} 】\n`;
-    report+=`  기록 수       : ${logs.length}건\n`;
-    report+=`  수행도 평균   : ${avg||'-'} / 5점\n`;
-    report+=`  체크 완료율   : ${pct}%\n`;
-    report+=`  종합 등급     : ${grade}\n`;
-    report+=`  업무 영역별   :\n`;
-    TASKS.forEach((task,j)=>{const ta=taskAvgs[j];const v=ta.c?Math.round(ta.s/ta.c*10)/10:0;report+=`    ${NUMS[j]} ${task.name.padEnd(14,' ')} : ${v||'미평가'}\n`});
+    report+='【 '+name+' 】\n';
+    report+='  기록 수       : '+logs.length+'건\n';
+    report+='  수행도 평균   : '+(avg||'-')+' / 5점\n';
+    report+='  체크 완료율   : '+pct+'%\n';
+    report+='  종합 등급     : '+grade+'\n';
+    report+='  업무 영역별   :\n';
+    TASKS.forEach((task,j)=>{
+      const ta=taskAvgs[j];
+      const v=ta.c?Math.round(ta.s/ta.c*10)/10:0;
+      report+='    '+NUMS[j]+' '+task.name.padEnd(14,' ')+' : '+(v||'미평가')+'\n';
+    });
     report+='\n';
   });
-
-  report+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-  report+=`3. 평가 기준\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-  report+=`  S등급 : 수행도 평균 4.5점 이상 (탁월한 수행)\n`;
-  report+=`  A등급 : 수행도 평균 4.0점 이상 (우수한 수행)\n`;
-  report+=`  B등급 : 수행도 평균 3.0점 이상 (양호한 수행)\n`;
-  report+=`  C등급 : 수행도 평균 2.0점 이상 (보통 수행)\n`;
-  report+=`  D등급 : 수행도 평균 2.0점 미만 (개선 필요)\n\n`;
-  report+=`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-  report+=`본 보고서는 멘티 업무 대시보드에서 자동 생성되었습니다.\n(주)오픈웍스 스마트기술팀`;
-
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  report+='3. 평가 기준\n';
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+  report+='  S등급 : 수행도 평균 4.5점 이상 (탁월한 수행)\n';
+  report+='  A등급 : 수행도 평균 4.0점 이상 (우수한 수행)\n';
+  report+='  B등급 : 수행도 평균 3.0점 이상 (양호한 수행)\n';
+  report+='  C등급 : 수행도 평균 2.0점 이상 (보통 수행)\n';
+  report+='  D등급 : 수행도 평균 2.0점 미만 (개선 필요)\n\n';
+  report+='━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n';
+  report+='본 보고서는 멘티 업무 대시보드에서 자동 생성되었습니다.\n(주)오픈웍스 스마트기술팀';
   const sec=document.getElementById('report-section');
-  sec.innerHTML=`<div class="report-box">
-    <div class="report-title">
-      <span>📋 ${periodLabel} 보고서 자동 생성</span>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost" onclick="copyReport()">📋 복사</button>
-        <button class="btn btn-primary" id="btn-download-report">⬇ 다운로드</button>      </div>
-    </div>
-    <div class="report-content" id="report-text">${report}</div>
-  </div>`;
+  sec.innerHTML='<div class="report-box"><div class="report-title"><span>📋 '+periodLabel+' 보고서 자동 생성</span><div style="display:flex;gap:8px"><button class="btn btn-ghost" id="btn-copy-report">📋 복사</button><button class="btn btn-primary" id="btn-download-report">⬇ 다운로드</button></div></div><div class="report-content" id="report-text"></div></div>';
+  document.getElementById('report-text').textContent=report;
+  const copyBtn=document.getElementById('btn-copy-report');
+  const dlBtn=document.getElementById('btn-download-report');
+  if(copyBtn) copyBtn.onclick=()=>navigator.clipboard.writeText(report).then(()=>toast('보고서가 복사됐어요!'));
+  if(dlBtn) dlBtn.onclick=()=>{
+    const blob=new Blob([report],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=periodLabel+'보고서_'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'.txt';
+    a.click();
+  };
   sec.scrollIntoView({behavior:'smooth'});
-  if(window._rebindReportBtns) window._rebindReportBtns();
 };
+
 window.copyReport=()=>navigator.clipboard.writeText(document.getElementById('report-text').textContent).then(()=>toast('보고서가 복사됐어요!'));
 window.downloadReport=(label)=>{
   const blob=new Blob([document.getElementById('report-text').textContent],{type:'text/plain;charset=utf-8'});
@@ -1555,173 +1557,35 @@ window.saveEvalComment=async(name)=>{
 };
 
 window.copyEvalReport=(name)=>{
-  const card=document.querySelector('.eval-card');if(!card){toast('평가표를 먼저 로드해주세요');return;}
-  const comment=document.getElementById(`eval-comment-${name}`)?.value||'';
+  const card=document.querySelector('.eval-card');
+  if(!card){toast('평가표를 먼저 로드해주세요');return;}
+  const comment=document.getElementById('eval-comment-'+name)?.value||'';
   const verdict=card.querySelector('.verdict-badge')?.textContent||'';
-  const grade=card.querySelector('.eval-box-val')?.textContent||'';
-  let txt=`═══════════════════════════════════
- 정직원 전환 평가서 · (주)오픈웍스
-═══════════════════════════════════
-
-`;
-  txt+=`▸ 대상자   : ${name}
-▸ 부서     : 스마트기술팀
-▸ 작성일   : ${new Date().toLocaleDateString('ko-KR')}
-▸ 판정     : ${verdict}
-
-`;
-  const boxes=[...card.querySelectorAll('.eval-box')];
-  boxes.forEach(b=>{txt+=`• ${b.querySelector('.eval-box-lbl').textContent} : ${b.querySelector('.eval-box-val').textContent}
-`});
-  txt+='
-업무 영역별 평가
-';
-  [...card.querySelectorAll('.eval-task-item')].forEach(t=>{txt+=`  ${t.querySelector('.eta-num').textContent} ${t.querySelector('.eta-name').textContent} : ${t.querySelector('.eta-score').textContent}
-`});
-  if(comment)txt+=`
-멘토 의견
-${comment}
-`;
-  txt+='
-═══════════════════════════════════';
+  let txt='═══════════════════════════════════\n 정직원 전환 평가서 · (주)오픈웍스\n═══════════════════════════════════\n\n';
+  txt+='▸ 대상자   : '+name+'\n▸ 부서     : 스마트기술팀\n▸ 작성일   : '+new Date().toLocaleDateString('ko-KR')+'\n▸ 판정     : '+verdict+'\n\n';
+  [...card.querySelectorAll('.eval-box')].forEach(b=>{txt+='• '+b.querySelector('.eval-box-lbl').textContent+' : '+b.querySelector('.eval-box-val').textContent+'\n';});
+  txt+='\n업무 영역별 평가\n';
+  [...card.querySelectorAll('.eval-task-item')].forEach(t=>{txt+='  '+t.querySelector('.eta-num').textContent+' '+t.querySelector('.eta-name').textContent+' : '+t.querySelector('.eta-score').textContent+'\n';});
+  if(comment) txt+='\n멘토 의견\n'+comment+'\n';
+  txt+='\n═══════════════════════════════════';
   navigator.clipboard.writeText(txt).then(()=>toast('평가서가 복사됐어요!'));
 };
 
 window.downloadEvalReport=(name)=>{
-  window.copyEvalReport(name);
-  setTimeout(()=>{
-    const comment=document.getElementById(`eval-comment-${name}`)?.value||'';
-    const card=document.querySelector('.eval-card');if(!card)return;
-    const verdict=card.querySelector('.verdict-badge')?.textContent||'';
-    let txt=`═══════════════════════════════════
- 정직원 전환 평가서 · (주)오픈웍스
-═══════════════════════════════════
-
-`;
-    txt+=`▸ 대상자   : ${name}
-▸ 부서     : 스마트기술팀
-▸ 작성일   : ${new Date().toLocaleDateString('ko-KR')}
-▸ 판정     : ${verdict}
-
-`;
-    const boxes=[...card.querySelectorAll('.eval-box')];
-    boxes.forEach(b=>{txt+=`• ${b.querySelector('.eval-box-lbl').textContent} : ${b.querySelector('.eval-box-val').textContent}
-`});
-    txt+='
-업무 영역별 평가
-';
-    [...card.querySelectorAll('.eval-task-item')].forEach(t=>{txt+=`  ${t.querySelector('.eta-num').textContent} ${t.querySelector('.eta-name').textContent} : ${t.querySelector('.eta-score').textContent}
-`});
-    if(comment)txt+=`
-멘토 의견
-${comment}
-`;
-    txt+='
-═══════════════════════════════════';
-    const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=`전환평가서_${name}_${new Date().toISOString().split('T')[0]}.txt`;a.click();
-  },100);
+  const card=document.querySelector('.eval-card');if(!card)return;
+  const comment=document.getElementById('eval-comment-'+name)?.value||'';
+  const verdict=card.querySelector('.verdict-badge')?.textContent||'';
+  let txt='═══════════════════════════════════\n 정직원 전환 평가서 · (주)오픈웍스\n═══════════════════════════════════\n\n';
+  txt+='▸ 대상자   : '+name+'\n▸ 부서     : 스마트기술팀\n▸ 작성일   : '+new Date().toLocaleDateString('ko-KR')+'\n▸ 판정     : '+verdict+'\n\n';
+  [...card.querySelectorAll('.eval-box')].forEach(b=>{txt+='• '+b.querySelector('.eval-box-lbl').textContent+' : '+b.querySelector('.eval-box-val').textContent+'\n';});
+  txt+='\n업무 영역별 평가\n';
+  [...card.querySelectorAll('.eval-task-item')].forEach(t=>{txt+='  '+t.querySelector('.eta-num').textContent+' '+t.querySelector('.eta-name').textContent+' : '+t.querySelector('.eta-score').textContent+'\n';});
+  if(comment) txt+='\n멘토 의견\n'+comment+'\n';
+  txt+='\n═══════════════════════════════════';
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='전환평가서_'+name+'_'+new Date().toISOString().split('T')[0]+'.txt';
+  a.click();
 };
 
-// ══════════════════════════════════════════════
-// ③ 단계 트래커
-// ══════════════════════════════════════════════
-const STAGE_DEFS=[
-  {label:'1단계
-교육',desc:'업무 프로세스 및 시스템 교육'},
-  {label:'2단계
-실습 동행',desc:'선임과 함께 실제 업무 동행'},
-  {label:'3단계
-단독 수행',desc:'익숙해진 업무 단독 처리'},
-  {label:'4단계
-평가',desc:'최종 평가 및 전환 판정'},
-];
-
-async function loadStage(){
-  const cont=document.getElementById('stage-content');if(!cont)return;
-  if(!menteeList.length){cont.innerHTML='<div class="no-data">멘티를 추가하면 표시됩니다</div>';return;}
-  cont.innerHTML='';
-
-  await Promise.all(menteeList.map(async(name,idx)=>{
-    const color=COLORS[idx%COLORS.length];
-    const stageSnap=await get(ref(db,`stages/${name}`));
-    const stageData=stageSnap.exists()?stageSnap.val():{currentStage:0,dates:['','','',''],notes:''};
-    const cur=stageData.currentStage||0;
-    const dates=stageData.dates||['','','',''];
-    const notes=stageData.notes||'';
-
-    const logSnap=await get(ref(db,`logs/${name}`));
-    const logCount=logSnap.exists()?Object.keys(logSnap.val()).length:0;
-    const avgs=logSnap.exists()?Object.values(logSnap.val()).filter(l=>l.avg).map(l=>l.avg):[];
-    const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length*10)/10:0;
-
-    const card=document.createElement('div');card.className='stage-card';
-    const stagesHtml=STAGE_DEFS.map((s,i)=>{
-      const done=i<cur;const current=i===cur;
-      const circleClass=done?'done':current?'current':'';
-      const labelClass=done?'done':current?'current':'';
-      const connClass=i<STAGE_DEFS.length-1?(i<cur?'done':''):'';
-      return `<div class="stage-step">
-        <div class="stage-step-inner" data-action="setStage" data-name="${name}" data-i="${i}">
-          <div class="stage-circle ${circleClass}">${done?'✓':i+1}</div>
-          <div class="stage-label ${labelClass}">${s.label}</div>
-        </div>
-        ${i<STAGE_DEFS.length-1?`<div class="stage-connector ${connClass}"></div>`:''}
-      </div>`;
-    }).join('');
-
-    card.innerHTML=`
-      <div class="stage-header">
-        <div class="stage-name">
-          <div style="width:32px;height:32px;border-radius:9px;background:${color}22;color:${color};display:flex;align-items:center;justify-content:center;font-weight:700">${name[0]}</div>
-          ${name}
-          <span style="font-size:.75rem;font-weight:500;color:${color};background:${color}18;padding:2px 9px;border-radius:99px">${STAGE_DEFS[Math.min(cur,3)].label.replace('
-',' ')}</span>
-        </div>
-        <div class="stage-progress-text">${cur}/4단계 진행 중</div>
-      </div>
-      <div class="stages-wrap">${stagesHtml}</div>
-      <div class="stage-detail">
-        ${STAGE_DEFS.map((s,i)=>`<div class="stage-detail-item"><div class="sdl">${s.label.replace('
-',' ')}</div><div class="sdv">${dates[i]||'-'}</div></div>`).join('')}
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-        <div style="background:var(--s3);border-radius:8px;padding:9px;text-align:center"><div class="sdl">총 기록 수</div><div class="sdv" style="color:${color};font-weight:700">${logCount}건</div></div>
-        <div style="background:var(--s3);border-radius:8px;padding:9px;text-align:center"><div class="sdl">수행도 평균</div><div class="sdv" style="color:${color};font-weight:700">${avg||'-'}점</div></div>
-        <div style="background:var(--s3);border-radius:8px;padding:9px;text-align:center"><div class="sdl">현재 단계</div><div class="sdv" style="color:${color};font-weight:700">${cur+1}단계</div></div>
-      </div>
-      <div style="font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.3px">단계 메모 / 특이사항</div>
-      <textarea class="stage-note-area" id="stage-note-${name}" placeholder="단계별 특이사항이나 메모를 입력하세요...">${notes}</textarea>
-      <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
-        <button class="btn btn-ghost" data-action="saveStage" data-name="${name}">💾 메모 저장</button>
-      </div>`;
-    cont.appendChild(card);
-  }));
-}
-
-window.setStage=async(name,stageIdx)=>{
-  const stageSnap=await get(ref(db,`stages/${name}`));
-  const stageData=stageSnap.exists()?stageSnap.val():{currentStage:0,dates:['','','',''],notes:''};
-  const dates=stageData.dates||['','','',''];
-  const newStage=stageIdx+1>stageData.currentStage?stageIdx+1:stageIdx;
-  if(!dates[stageIdx]) dates[stageIdx]=new Date().toISOString().split('T')[0];
-  await set(ref(db,`stages/${name}`),{...stageData,currentStage:newStage,dates});
-  toast(`${name} — ${STAGE_DEFS[stageIdx].label.replace('
-',' ')} 단계로 업데이트됐어요!`);
-  loadStage();
-};
-
-window.saveStageNote=async(name)=>{
-  const notes=document.getElementById(`stage-note-${name}`)?.value||'';
-  const stageSnap=await get(ref(db,`stages/${name}`));
-  const stageData=stageSnap.exists()?stageSnap.val():{currentStage:0,dates:['','','','']};
-  await set(ref(db,`stages/${name}`),{...stageData,notes});
-  toast('메모가 저장됐어요!');
-};
-
-// gotoTab 확장은 기존 함수에 통합됨
-
-</script>
-</body>
-</html>
