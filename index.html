@@ -332,6 +332,66 @@ input[readonly]{background:var(--bg);cursor:not-allowed;color:var(--text2)}
   .grid-4,.stats-kpi{grid-template-columns:1fr}
   .mentee-cards{grid-template-columns:1fr}
 }
+
+/* ── Growth chart ── */
+.growth-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:7px}
+.gr-date{font-size:.78rem;font-weight:600;color:var(--text2);width:90px;flex-shrink:0}
+.gr-name{font-size:.78rem;color:var(--text2);width:70px;flex-shrink:0}
+.gr-grade{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:99px;width:50px;text-align:center}
+.gr-bar-track{flex:1;height:8px;background:var(--s4);border-radius:99px;overflow:hidden}
+.gr-bar-fill{height:100%;border-radius:99px;transition:width .5s}
+.gr-val{font-size:.75rem;color:var(--text2);width:30px;text-align:right;flex-shrink:0}
+
+/* ── Eval card ── */
+.eval-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;margin-bottom:16px}
+.eval-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.eval-name-block{display:flex;align-items:center;gap:12px}
+.eval-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff}
+.eval-info-name{font-size:1rem;font-weight:800;color:var(--text)}
+.eval-info-sub{font-size:.72rem;color:var(--text3);margin-top:2px}
+.eval-verdict{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.verdict-badge{font-size:.85rem;font-weight:800;padding:6px 18px;border-radius:99px;letter-spacing:.5px}
+.verdict-pass{background:rgba(52,211,153,.18);color:var(--green);border:1.5px solid var(--green)}
+.verdict-hold{background:rgba(251,191,36,.18);color:var(--yellow);border:1.5px solid var(--yellow)}
+.verdict-fail{background:rgba(248,113,113,.18);color:var(--red);border:1.5px solid var(--red)}
+.eval-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.eval-box{background:var(--s3);border-radius:8px;padding:11px;text-align:center}
+.eval-box-lbl{font-size:.62rem;color:var(--text3);margin-bottom:4px;letter-spacing:.3px}
+.eval-box-val{font-size:1.1rem;font-weight:800}
+.eval-task-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.eval-task-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s3);border-radius:7px}
+.eta-num{font-size:.7rem;font-weight:700;color:var(--blue);width:18px}
+.eta-name{font-size:.77rem;color:var(--text2);flex:1}
+.eta-score{font-size:.78rem;font-weight:700}
+.eval-comment-section{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.eval-comment-lbl{font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:7px;letter-spacing:.3px}
+.eval-comment-input{width:100%;font-family:var(--font);font-size:.84rem;color:var(--text);background:var(--s3);border:1.5px solid var(--border2);border-radius:var(--rs);padding:9px 13px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:border-color .2s}
+.eval-comment-input:focus{border-color:var(--blue)}
+.eval-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+
+/* ── Stage tracker ── */
+.stage-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:20px 22px;margin-bottom:14px}
+.stage-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.stage-name{font-size:.95rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px}
+.stage-progress-text{font-size:.75rem;color:var(--text3)}
+.stages-wrap{display:flex;align-items:center;gap:0;margin-bottom:16px}
+.stage-step{flex:1;position:relative}
+.stage-step-inner{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:4px}
+.stage-circle{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;border:2px solid var(--border2);background:var(--s3);color:var(--text3);transition:all .2s;position:relative;z-index:1}
+.stage-circle.done{background:var(--green);border-color:var(--green);color:#0a2015;box-shadow:0 0 12px rgba(52,211,153,.3)}
+.stage-circle.current{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 0 12px rgba(79,142,247,.3)}
+.stage-circle:hover{transform:scale(1.1)}
+.stage-label{font-size:.68rem;color:var(--text3);text-align:center;line-height:1.3;font-weight:500}
+.stage-label.done{color:var(--green)}.stage-label.current{color:var(--blue)}
+.stage-connector{width:100%;height:2px;background:var(--border2);margin-top:-19px;position:relative;top:0}
+.stage-connector.done{background:var(--green)}
+.stage-detail{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.stage-detail-item{background:var(--s3);border-radius:8px;padding:10px 12px}
+.sdl{font-size:.65rem;color:var(--text3);margin-bottom:4px;letter-spacing:.3px}
+.sdv{font-size:.78rem;font-weight:600;color:var(--text2)}
+.stage-note-area{font-family:var(--font);font-size:.82rem;color:var(--text);background:var(--s3);border:1.5px solid var(--border2);border-radius:var(--rs);padding:8px 12px;width:100%;resize:vertical;min-height:60px;line-height:1.5;outline:none;transition:border-color .2s}
+.stage-note-area:focus{border-color:var(--blue)}
+
 </style>
 </head>
 <body>
@@ -355,7 +415,10 @@ input[readonly]{background:var(--bg);cursor:not-allowed;color:var(--text2)}
   <div class="nav-item active" onclick="gotoTab('dashboard',this)"><span class="ni">🏠</span>대시보드</div>
   <div class="nav-item" onclick="gotoTab('write',this)"><span class="ni">✏️</span>업무 작성</div>
   <div class="nav-item" onclick="gotoTab('calendar',this)"><span class="ni">📅</span>캘린더</div>
-  <div class="nav-item" onclick="gotoTab('stats',this)"><span class="ni">📊</span>통계 & 보고서</div>
+  <div class="nav-item" onclick="gotoTab('stats',this)"><span class="ni">📊</span>통계 &amp; 보고서</div>
+  <div class="nav-item" onclick="gotoTab('growth',this)"><span class="ni">📈</span>성장 추이</div>
+  <div class="nav-item" onclick="gotoTab('eval',this)"><span class="ni">🏆</span>전환 평가표</div>
+  <div class="nav-item" onclick="gotoTab('stage',this)"><span class="ni">🪜</span>단계 트래커</div>
   <div class="nav-divider"></div>
   <div class="nav-mentee-section">
     <div class="nav-mentee-title">멘티</div>
@@ -495,6 +558,37 @@ input[readonly]{background:var(--bg);cursor:not-allowed;color:var(--text2)}
     <div id="report-section"></div>
   </div>
 
+
+  <!-- GROWTH PANEL -->
+  <div class="panel" id="panel-growth">
+    <div class="page-title">성장 추이</div>
+    <div class="page-sub">멘티별 수행도 변화를 날짜순으로 확인하세요</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px" id="growth-mentee-filter"></div>
+    <div class="card" id="growth-chart-wrap">
+      <div class="section-title">📈 수행도 추이</div>
+      <canvas id="growth-canvas" style="width:100%;max-height:320px"></canvas>
+      <div id="growth-legend" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px"></div>
+    </div>
+    <div class="card" style="margin-top:14px" id="growth-table-wrap">
+      <div class="section-title">📋 날짜별 상세</div>
+      <div id="growth-table"></div>
+    </div>
+  </div>
+
+  <!-- EVAL PANEL -->
+  <div class="panel" id="panel-eval">
+    <div class="page-title">정직원 전환 평가표</div>
+    <div class="page-sub">누적 데이터를 기반으로 전환 판단 근거를 자동 생성합니다</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px" id="eval-mentee-filter"></div>
+    <div id="eval-content"><div class="no-data">멘티를 선택하면 평가표가 생성됩니다</div></div>
+  </div>
+
+  <!-- STAGE PANEL -->
+  <div class="panel" id="panel-stage">
+    <div class="page-title">업무 단계 트래커</div>
+    <div class="page-sub">멘티별 교육→실습→단독수행→평가 진행 상황을 관리하세요</div>
+    <div id="stage-content"><div class="no-data">멘티를 추가하면 단계 트래커가 표시됩니다</div></div>
+  </div>
 </div><!-- content -->
 </div><!-- layout -->
 </div><!-- app -->
@@ -1113,6 +1207,415 @@ window.exportExcel=async()=>{
 
 document.getElementById('modal-bg').onclick=e=>{if(e.target===document.getElementById('modal-bg'))closeModal()};
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+// ══════════════════════════════════════════════
+// ① 성장 추이
+// ══════════════════════════════════════════════
+let growthMenteeFilter = null;
+
+function renderGrowthMenteeFilter(){
+  const c = document.getElementById('growth-mentee-filter');
+  if(!c) return;
+  c.innerHTML = '';
+  const all = document.createElement('div');
+  all.style.cssText = `padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid ${growthMenteeFilter===null?'var(--blue)':'var(--border2)'};background:${growthMenteeFilter===null?'var(--blue-d)':'transparent'};color:${growthMenteeFilter===null?'var(--blue)':'var(--text2)'};transition:all .18s`;
+  all.textContent='전체';all.onclick=()=>{growthMenteeFilter=null;renderGrowthMenteeFilter();loadGrowth()};
+  c.appendChild(all);
+  menteeList.forEach((name,i)=>{
+    const b=document.createElement('div');const color=COLORS[i%COLORS.length];
+    b.style.cssText=`padding:5px 13px;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;border:1.5px solid ${growthMenteeFilter===name?color:'var(--border2)'};background:${growthMenteeFilter===name?color+'22':'transparent'};color:${growthMenteeFilter===name?color:'var(--text2)'};transition:all .18s`;
+    b.textContent=name;b.onclick=()=>{growthMenteeFilter=name;renderGrowthMenteeFilter();loadGrowth()};
+    c.appendChild(b);
+  });
+}
+
+async function loadGrowth(){
+  const targets = growthMenteeFilter ? [growthMenteeFilter] : menteeList;
+  const allEntries = [];
+  await Promise.all(targets.map(async(name,idx)=>{
+    const s = await get(ref(db,`logs/${name}`));
+    if(!s.exists()) return;
+    Object.values(s.val()).forEach(l=>{
+      if(l.date && l.avg) allEntries.push({name, date:l.date, avg:l.avg, grade:l.grade, checkPct:l.checkPct||0, day:l.day||''});
+    });
+  }));
+  allEntries.sort((a,b)=>a.date.localeCompare(b.date));
+
+  // Draw SVG chart
+  const canvas = document.getElementById('growth-canvas');
+  if(!canvas) return;
+  const byMentee = {};
+  allEntries.forEach(e=>{if(!byMentee[e.name])byMentee[e.name]=[];byMentee[e.name].push(e)});
+  const allDates = [...new Set(allEntries.map(e=>e.date))].sort();
+
+  if(!allDates.length){
+    canvas.parentElement.innerHTML='<div class="section-title">📈 수행도 추이</div><div class="no-data">저장된 기록이 없습니다</div>';
+    return;
+  }
+
+  const W=800,H=260,PAD={t:20,r:20,b:40,l:44};
+  const innerW=W-PAD.l-PAD.r, innerH=H-PAD.t-PAD.b;
+  const xStep = allDates.length>1 ? innerW/(allDates.length-1) : innerW/2;
+  const yMin=0, yMax=5;
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">`;
+  // grid lines
+  for(let y=0;y<=5;y++){
+    const cy=PAD.t+innerH-((y-yMin)/(yMax-yMin))*innerH;
+    svg+=`<line x1="${PAD.l}" y1="${cy}" x2="${PAD.l+innerW}" y2="${cy}" stroke="#252c42" stroke-width="1"/>`;
+    svg+=`<text x="${PAD.l-6}" y="${cy+4}" font-size="11" fill="#4a5270" text-anchor="end">${y}</text>`;
+  }
+  // x labels — show max 8
+  const step=Math.max(1,Math.ceil(allDates.length/8));
+  allDates.forEach((date,i)=>{
+    if(i%step!==0&&i!==allDates.length-1) return;
+    const cx=PAD.l+(allDates.length>1?i*xStep:innerW/2);
+    const d=new Date(date);
+    svg+=`<text x="${cx}" y="${H-PAD.b+16}" font-size="10" fill="#4a5270" text-anchor="middle">${d.getMonth()+1}/${d.getDate()}</text>`;
+  });
+
+  // lines per mentee
+  const menteeNames = Object.keys(byMentee);
+  menteeNames.forEach((name,mi)=>{
+    const color=COLORS[(menteeList.indexOf(name))%COLORS.length];
+    const pts=byMentee[name];
+    let pathD='', dotsSvg='';
+    pts.forEach((p,pi)=>{
+      const xi=allDates.indexOf(p.date);
+      const cx=PAD.l+(allDates.length>1?xi*xStep:innerW/2);
+      const cy=PAD.t+innerH-((p.avg-yMin)/(yMax-yMin))*innerH;
+      pathD+=(pi===0?`M${cx},${cy}`:`L${cx},${cy}`);
+      dotsSvg+=`<circle cx="${cx}" cy="${cy}" r="5" fill="${color}" stroke="var(--bg)" stroke-width="2"><title>${name} ${p.date}: ${p.avg}점 (${p.grade||''})</title></circle>`;
+    });
+    svg+=`<path d="${pathD}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" opacity="0.9"/>`;
+    svg+=dotsSvg;
+  });
+  svg+='</svg>';
+  canvas.outerHTML=`<div id="growth-canvas">${svg}</div>`;
+
+  // Legend
+  const legend=document.getElementById('growth-legend');
+  if(legend){
+    legend.innerHTML='';
+    menteeNames.forEach((name,mi)=>{
+      const color=COLORS[(menteeList.indexOf(name))%COLORS.length];
+      const avgs=byMentee[name].map(p=>p.avg);
+      const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length*10)/10:0;
+      const first=byMentee[name][0]?.avg||0, last=byMentee[name][byMentee[name].length-1]?.avg||0;
+      const trend=last-first;
+      const el=document.createElement('div');
+      el.style.cssText='display:flex;align-items:center;gap:7px;padding:6px 12px;background:var(--s2);border-radius:8px;border:1px solid var(--border)';
+      el.innerHTML=`<div style="width:12px;height:12px;border-radius:50%;background:${color}"></div><span style="font-size:.78rem;font-weight:600;color:var(--text)">${name}</span><span style="font-size:.72rem;color:${color}">${avg}점 평균</span><span style="font-size:.7rem;color:${trend>=0?'var(--green)':'var(--red)'}">${trend>=0?'▲':'▼'}${Math.abs(Math.round(trend*10)/10)}</span>`;
+      legend.appendChild(el);
+    });
+  }
+
+  // Table
+  const table=document.getElementById('growth-table');
+  if(table){
+    table.innerHTML='';
+    [...allEntries].reverse().slice(0,30).forEach(e=>{
+      const color=COLORS[(menteeList.indexOf(e.name))%COLORS.length];
+      const gradeColor={'S':'var(--purple)','A':'var(--green)','B':'var(--blue)','C':'var(--yellow)','D':'var(--red)'}[e.grade]||'var(--text3)';
+      const row=document.createElement('div');row.className='growth-row';
+      row.innerHTML=`
+        <div class="gr-date">${e.date}</div>
+        <div class="gr-name" style="color:${color}">${e.name}</div>
+        <div class="gr-grade" style="background:${gradeColor}22;color:${gradeColor}">${e.grade||'-'}</div>
+        <div class="gr-bar-track"><div class="gr-bar-fill" style="width:${e.avg/5*100}%;background:${color}"></div></div>
+        <div class="gr-val">${e.avg}</div>`;
+      table.appendChild(row);
+    });
+    if(!allEntries.length) table.innerHTML='<div class="no-data">기록이 없습니다</div>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// ② 정직원 전환 평가표
+// ══════════════════════════════════════════════
+let evalMenteeFilter = null;
+
+function renderEvalMenteeFilter(){
+  const c=document.getElementById('eval-mentee-filter');if(!c)return;
+  c.innerHTML='';
+  menteeList.forEach((name,i)=>{
+    const color=COLORS[i%COLORS.length];
+    const b=document.createElement('div');
+    b.style.cssText=`padding:6px 14px;border-radius:99px;font-size:.82rem;font-weight:600;cursor:pointer;border:1.5px solid ${evalMenteeFilter===name?color:'var(--border2)'};background:${evalMenteeFilter===name?color+'22':'transparent'};color:${evalMenteeFilter===name?color:'var(--text2)'};transition:all .18s`;
+    b.textContent=name;b.onclick=()=>{evalMenteeFilter=name;renderEvalMenteeFilter();loadEval()};
+    c.appendChild(b);
+  });
+  if(!evalMenteeFilter&&menteeList.length){evalMenteeFilter=menteeList[0];renderEvalMenteeFilter();}
+}
+
+async function loadEval(){
+  const cont=document.getElementById('eval-content');if(!cont)return;
+  if(!evalMenteeFilter){cont.innerHTML='<div class="no-data">멘티를 선택해주세요</div>';return;}
+  const name=evalMenteeFilter;
+  const idx=menteeList.indexOf(name);
+  const color=COLORS[idx>=0?idx%COLORS.length:0];
+  const s=await get(ref(db,`logs/${name}`));
+  const logs=s.exists()?Object.values(s.val()).sort((a,b)=>a.date?.localeCompare(b.date||'')):[];
+
+  const avgs=logs.filter(l=>l.avg).map(l=>l.avg);
+  const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length*10)/10:0;
+  const pcts=logs.filter(l=>l.checkPct!=null).map(l=>l.checkPct);
+  const pct=pcts.length?Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):0;
+  const grade=avg>=4.5?'S':avg>=4?'A':avg>=3?'B':avg>=2?'C':avgs.length?'D':'-';
+
+  // trend — compare first half vs second half
+  let trend='데이터 부족';
+  if(avgs.length>=4){
+    const half=Math.floor(avgs.length/2);
+    const earlyAvg=avgs.slice(0,half).reduce((a,b)=>a+b,0)/half;
+    const lateAvg=avgs.slice(half).reduce((a,b)=>a+b,0)/(avgs.length-half);
+    const diff=lateAvg-earlyAvg;
+    trend=diff>0.3?`▲ 향상 (+${Math.round(diff*10)/10}점)`:diff<-0.3?`▼ 하락 (${Math.round(diff*10)/10}점)`:'➡ 유지 (안정적)';
+  }
+
+  // task avgs
+  const taskAvgs=Array(7).fill(null).map(()=>({s:0,c:0}));
+  logs.forEach(l=>{if(l.perfVals)l.perfVals.forEach((v,i)=>{if(v>0){taskAvgs[i].s+=v;taskAvgs[i].c++}})});
+
+  // verdict logic
+  const weakTasks=taskAvgs.filter(ta=>ta.c&&ta.s/ta.c<3).length;
+  let verdict='hold', verdictText='보류', verdictClass='verdict-hold';
+  if(avg>=3.5&&pct>=60&&weakTasks===0&&logs.length>=5){verdict='pass';verdictText='전환 권고';verdictClass='verdict-pass';}
+  else if(avg<2.5||weakTasks>=3){verdict='fail';verdictText='전환 불가';verdictClass='verdict-fail';}
+
+  // saved comment
+  const savedComment = await get(ref(db,`eval_comments/${name}`));
+  const commentVal = savedComment.exists()?savedComment.val():'';
+
+  const firstDate=logs[0]?.date||'-';
+  const lastDate=logs[logs.length-1]?.date||'-';
+
+  cont.innerHTML=`
+  <div class="eval-card">
+    <div class="eval-header">
+      <div class="eval-name-block">
+        <div class="eval-avatar" style="background:${color}22;color:${color}">${name[0]}</div>
+        <div>
+          <div class="eval-info-name">${name}</div>
+          <div class="eval-info-sub">스마트기술팀 · 입사 ${firstDate} ~ 최근 ${lastDate}</div>
+        </div>
+      </div>
+      <div class="eval-verdict">
+        <div class="verdict-badge ${verdictClass}">${verdictText}</div>
+        <div style="font-size:.68rem;color:var(--text3);margin-top:4px">총 ${logs.length}건 기록 기준</div>
+      </div>
+    </div>
+
+    <div class="eval-grid">
+      <div class="eval-box"><div class="eval-box-lbl">종합 등급</div><div class="eval-box-val" style="color:${grade==='S'?'var(--purple)':grade==='A'?'var(--green)':grade==='B'?'var(--blue)':grade==='C'?'var(--yellow)':'var(--red)'}">${grade}</div></div>
+      <div class="eval-box"><div class="eval-box-lbl">수행도 평균</div><div class="eval-box-val" style="color:${color}">${avg||'-'}점</div></div>
+      <div class="eval-box"><div class="eval-box-lbl">체크 완료율</div><div class="eval-box-val" style="color:${color}">${pct}%</div></div>
+      <div class="eval-box"><div class="eval-box-lbl">성장 추이</div><div class="eval-box-val" style="font-size:.85rem;color:${trend.includes('향상')?'var(--green)':trend.includes('하락')?'var(--red)':'var(--text2)'}">${trend.split(' ')[0]}</div></div>
+      <div class="eval-box"><div class="eval-box-lbl">기록 건수</div><div class="eval-box-val" style="color:${color}">${logs.length}건</div></div>
+    </div>
+
+    <div style="font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:.3px">업무 영역별 평가</div>
+    <div class="eval-task-grid">
+      ${TASKS.map((task,i)=>{
+        const ta=taskAvgs[i];const v=ta.c?Math.round(ta.s/ta.c*10)/10:0;
+        const tc=v>=4?'var(--green)':v>=3?'var(--blue)':v>=2?'var(--yellow)':ta.c?'var(--red)':'var(--text3)';
+        return `<div class="eval-task-item"><span class="eta-num">${NUMS[i]}</span><span class="eta-name">${task.name}</span><span class="eta-score" style="color:${tc}">${v||'미평가'}</span></div>`;
+      }).join('')}
+    </div>
+
+    <div class="eval-comment-section">
+      <div class="eval-comment-lbl">멘토 최종 의견 <span style="color:var(--text3);font-weight:400">(상무님 보고용)</span></div>
+      <textarea class="eval-comment-input" id="eval-comment-${name}" placeholder="이 직원에 대한 종합 평가 의견을 입력해주세요...">${commentVal}</textarea>
+      <div class="eval-actions">
+        <button class="btn btn-ghost" onclick="copyEvalReport('${name}')">📋 평가서 복사</button>
+        <button class="btn btn-ghost" onclick="saveEvalComment('${name}')">💾 의견 저장</button>
+        <button class="btn btn-primary" onclick="downloadEvalReport('${name}')">⬇ PDF용 다운로드</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.saveEvalComment=async(name)=>{
+  const val=document.getElementById(`eval-comment-${name}`)?.value||'';
+  await set(ref(db,`eval_comments/${name}`),val);
+  toast('의견이 저장됐어요!');
+};
+
+window.copyEvalReport=(name)=>{
+  const card=document.querySelector('.eval-card');if(!card){toast('평가표를 먼저 로드해주세요');return;}
+  const comment=document.getElementById(`eval-comment-${name}`)?.value||'';
+  const verdict=card.querySelector('.verdict-badge')?.textContent||'';
+  const grade=card.querySelector('.eval-box-val')?.textContent||'';
+  let txt=`═══════════════════════════════════
+ 정직원 전환 평가서 · (주)오픈웍스
+═══════════════════════════════════
+
+`;
+  txt+=`▸ 대상자   : ${name}
+▸ 부서     : 스마트기술팀
+▸ 작성일   : ${new Date().toLocaleDateString('ko-KR')}
+▸ 판정     : ${verdict}
+
+`;
+  const boxes=[...card.querySelectorAll('.eval-box')];
+  boxes.forEach(b=>{txt+=`• ${b.querySelector('.eval-box-lbl').textContent} : ${b.querySelector('.eval-box-val').textContent}
+`});
+  txt+='
+업무 영역별 평가
+';
+  [...card.querySelectorAll('.eval-task-item')].forEach(t=>{txt+=`  ${t.querySelector('.eta-num').textContent} ${t.querySelector('.eta-name').textContent} : ${t.querySelector('.eta-score').textContent}
+`});
+  if(comment)txt+=`
+멘토 의견
+${comment}
+`;
+  txt+='
+═══════════════════════════════════';
+  navigator.clipboard.writeText(txt).then(()=>toast('평가서가 복사됐어요!'));
+};
+
+window.downloadEvalReport=(name)=>{
+  window.copyEvalReport(name);
+  setTimeout(()=>{
+    const comment=document.getElementById(`eval-comment-${name}`)?.value||'';
+    const card=document.querySelector('.eval-card');if(!card)return;
+    const verdict=card.querySelector('.verdict-badge')?.textContent||'';
+    let txt=`═══════════════════════════════════
+ 정직원 전환 평가서 · (주)오픈웍스
+═══════════════════════════════════
+
+`;
+    txt+=`▸ 대상자   : ${name}
+▸ 부서     : 스마트기술팀
+▸ 작성일   : ${new Date().toLocaleDateString('ko-KR')}
+▸ 판정     : ${verdict}
+
+`;
+    const boxes=[...card.querySelectorAll('.eval-box')];
+    boxes.forEach(b=>{txt+=`• ${b.querySelector('.eval-box-lbl').textContent} : ${b.querySelector('.eval-box-val').textContent}
+`});
+    txt+='
+업무 영역별 평가
+';
+    [...card.querySelectorAll('.eval-task-item')].forEach(t=>{txt+=`  ${t.querySelector('.eta-num').textContent} ${t.querySelector('.eta-name').textContent} : ${t.querySelector('.eta-score').textContent}
+`});
+    if(comment)txt+=`
+멘토 의견
+${comment}
+`;
+    txt+='
+═══════════════════════════════════';
+    const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=`전환평가서_${name}_${new Date().toISOString().split('T')[0]}.txt`;a.click();
+  },100);
+};
+
+// ══════════════════════════════════════════════
+// ③ 단계 트래커
+// ══════════════════════════════════════════════
+const STAGE_DEFS=[
+  {label:'1단계
+교육',desc:'업무 프로세스 및 시스템 교육'},
+  {label:'2단계
+실습 동행',desc:'선임과 함께 실제 업무 동행'},
+  {label:'3단계
+단독 수행',desc:'익숙해진 업무 단독 처리'},
+  {label:'4단계
+평가',desc:'최종 평가 및 전환 판정'},
+];
+
+async function loadStage(){
+  const cont=document.getElementById('stage-content');if(!cont)return;
+  if(!menteeList.length){cont.innerHTML='<div class="no-data">멘티를 추가하면 표시됩니다</div>';return;}
+  cont.innerHTML='';
+
+  await Promise.all(menteeList.map(async(name,idx)=>{
+    const color=COLORS[idx%COLORS.length];
+    const stageSnap=await get(ref(db,`stages/${name}`));
+    const stageData=stageSnap.exists()?stageSnap.val():{currentStage:0,dates:['','','',''],notes:''};
+    const cur=stageData.currentStage||0;
+    const dates=stageData.dates||['','','',''];
+    const notes=stageData.notes||'';
+
+    const logSnap=await get(ref(db,`logs/${name}`));
+    const logCount=logSnap.exists()?Object.keys(logSnap.val()).length:0;
+    const avgs=logSnap.exists()?Object.values(logSnap.val()).filter(l=>l.avg).map(l=>l.avg):[];
+    const avg=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length*10)/10:0;
+
+    const card=document.createElement('div');card.className='stage-card';
+    const stagesHtml=STAGE_DEFS.map((s,i)=>{
+      const done=i<cur;const current=i===cur;
+      const circleClass=done?'done':current?'current':'';
+      const labelClass=done?'done':current?'current':'';
+      const connClass=i<STAGE_DEFS.length-1?(i<cur?'done':''):'';
+      return `<div class="stage-step">
+        <div class="stage-step-inner" onclick="setStage('${name}',${i})">
+          <div class="stage-circle ${circleClass}">${done?'✓':i+1}</div>
+          <div class="stage-label ${labelClass}">${s.label}</div>
+        </div>
+        ${i<STAGE_DEFS.length-1?`<div class="stage-connector ${connClass}"></div>`:''}
+      </div>`;
+    }).join('');
+
+    card.innerHTML=`
+      <div class="stage-header">
+        <div class="stage-name">
+          <div style="width:32px;height:32px;border-radius:9px;background:${color}22;color:${color};display:flex;align-items:center;justify-content:center;font-weight:700">${name[0]}</div>
+          ${name}
+          <span style="font-size:.75rem;font-weight:500;color:${color};background:${color}18;padding:2px 9px;border-radius:99px">${STAGE_DEFS[Math.min(cur,3)].label.replace('
+',' ')}</span>
+        </div>
+        <div class="stage-progress-text">${cur}/4단계 진행 중</div>
+      </div>
+      <div class="stages-wrap">${stagesHtml}</div>
+      <div class="stage-detail">
+        ${STAGE_DEFS.map((s,i)=>`<div class="stage-detail-item"><div class="sdl">${s.label.replace('
+',' ')}</div><div class="sdv">${dates[i]||'-'}</div></div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="background:var(--s3);border-radius:8px;padding:9px;text-align:center"><div class="sdl">총 기록 수</div><div class="sdv" style="color:${color};font-weight:700">${logCount}건</div></div>
+        <div style="background:var(--s3);border-radius:8px;padding:9px;text-align:center"><div class="sdl">수행도 평균</div><div class="sdv" style="color:${color};font-weight:700">${avg||'-'}점</div></div>
+        <div style="background:var(--s3);border-radius:8px;padding:9px;text-align:center"><div class="sdl">현재 단계</div><div class="sdv" style="color:${color};font-weight:700">${cur+1}단계</div></div>
+      </div>
+      <div style="font-size:.72rem;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:.3px">단계 메모 / 특이사항</div>
+      <textarea class="stage-note-area" id="stage-note-${name}" placeholder="단계별 특이사항이나 메모를 입력하세요...">${notes}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="saveStageNote('${name}')">💾 메모 저장</button>
+      </div>`;
+    cont.appendChild(card);
+  }));
+}
+
+window.setStage=async(name,stageIdx)=>{
+  const stageSnap=await get(ref(db,`stages/${name}`));
+  const stageData=stageSnap.exists()?stageSnap.val():{currentStage:0,dates:['','','',''],notes:''};
+  const dates=stageData.dates||['','','',''];
+  const newStage=stageIdx+1>stageData.currentStage?stageIdx+1:stageIdx;
+  if(!dates[stageIdx]) dates[stageIdx]=new Date().toISOString().split('T')[0];
+  await set(ref(db,`stages/${name}`),{...stageData,currentStage:newStage,dates});
+  toast(`${name} — ${STAGE_DEFS[stageIdx].label.replace('
+',' ')} 단계로 업데이트됐어요!`);
+  loadStage();
+};
+
+window.saveStageNote=async(name)=>{
+  const notes=document.getElementById(`stage-note-${name}`)?.value||'';
+  const stageSnap=await get(ref(db,`stages/${name}`));
+  const stageData=stageSnap.exists()?stageSnap.val():{currentStage:0,dates:['','','','']};
+  await set(ref(db,`stages/${name}`),{...stageData,notes});
+  toast('메모가 저장됐어요!');
+};
+
+// ── gotoTab 확장 ──
+const _origGotoTab = window.gotoTab;
+window.gotoTab=(tab,el)=>{
+  _origGotoTab(tab,el);
+  if(tab==='growth'){renderGrowthMenteeFilter();loadGrowth();}
+  if(tab==='eval'){renderEvalMenteeFilter();loadEval();}
+  if(tab==='stage'){loadStage();}
+};
+
 </script>
 </body>
 </html>
